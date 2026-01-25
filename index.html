@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤍L,C🤍 - App</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";  
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3OPY_DxVK7GtLT4mgCP5UpDyk5osQsNY",
+            authDomain: "l-clucia.firebaseapp.com",
+            projectId: "l-clucia",
+            storageBucket: "l-clucia.firebasestorage.app",
+            messagingSenderId: "129492728249",
+            appId: "1:129492728249:web:621ec83c2482d12bb71e68"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Función para traducir categorías
+        const getCategoryName = (category) => {
+            const categories = {
+                'arreglos': 'Arreglos',
+                'cosas_nuevas': 'Cosas Nuevas',
+                'implementado': 'Implementado',
+                'proxima_version': 'Próxima Versión'
+            };
+            return categories[category] || category;
+        };
+
+        // Funciones de registro y login
+        const registerUser = async (email, password) => {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                alert("Usuario registrado exitosamente!");
+
+                await addDoc(collection(db, "users"), {
+                    username: user.displayName || "Usuario nuevo",
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                loginUser(email, password);
+            } catch (error) {
+                console.error("Error al registrar: ", error.message);
+                alert("Error al registrar el usuario");
+            }
+        };
+
+        const loginUser = async (email, password) => {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                alert("Usuario autenticado exitosamente!");
+                
+                // Cargar novedades después del login
+                loadNews();
+            } catch (error) {
+                console.error("Error al iniciar sesión: ", error.message);
+                alert("Error al iniciar sesión");
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('welcomeName').textContent = `¡Bienvenida, ${user.displayName || user.email}!`;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userSince').textContent = "Miembro desde hoy";
+                
+                // Cargar novedades si hay usuario
+                loadNews();
+            }
+        });
+
+        const logoutUser = () => {
+            signOut(auth).then(() => {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+                alert("Has cerrado sesión");
+            }).catch(error => {
+                console.error("Error al cerrar sesión: ", error);
+            });
+        }
+
+        // Cargar novedades desde Firebase
+        const loadNews = async () => {
+            try {
+                const newsContainer = document.getElementById('newsContainer');
+                const loadingElement = document.getElementById('loadingNews');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (newsContainer) newsContainer.innerHTML = '';
+                
+                const q = query(
+                    collection(db, "news"),
+                    where("status", "==", "active"),
+                    orderBy("date", "desc")
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                
+                if (querySnapshot.empty) {
+                    if (newsContainer) {
+                        newsContainer.innerHTML = `
+                            <div class="no-news">
+                                <p>No hay novedades por el momento</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    const news = doc.data();
+                    addNewsToModal(news);
+                });
+                
+            } catch (error) {
+                console.error("Error cargando novedades: ", error);
+                const newsContainer = document.getElementById('newsContainer');
+                if (newsContainer) {
+                    newsContainer.innerHTML = `
+                        <div class="error-news">
+                            <p>Error cargando novedades</p>
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        // Agregar novedad al modal
+        const addNewsToModal = (news) => {
+            const newsContainer = document.getElementById('newsContainer');
+            if (!newsContainer) return;
+            
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item';
+            newsItem.setAttribute('data-category', news.category);
+            
+            // Icono según categoría
+            let icon = '📢';
+            if (news.category === 'arreglos') icon = '🔧';
+            else if (news.category === 'cosas_nuevas') icon = '🆕';
+            else if (news.category === 'implementado') icon = '✅';
+            else if (news.category === 'proxima_version') icon = '🚀';
+            
+            // Formatear fecha
+            const date = news.date ? new Date(news.date).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }) : 'Fecha no disponible';
+            
+            newsItem.innerHTML = `
+                <div class="news-header">
+                    <div class="news-category-badge ${news.category}">
+                        <span class="news-icon">${icon}</span>
+                        <span class="news-category">${getCategoryName(news.category)}</span>
+                    </div>
+                    <span class="news-date">${date}</span>
+                </div>
+                <div class="news-content">
+                    <h4>${news.title || 'Sin título'}</h4>
+                    <p>${news.description || 'Sin descripción'}</p>
+                </div>
+                ${news.version ? `<div class="news-version">Versión: ${news.version}</div>` : ''}
+            `;
+            
+            newsContainer.appendChild(newsItem);
+        };
+
+        // Modo de tema oscuro y temas de color
+        let currentTheme = localStorage.getItem("theme") || "light";
+        let currentColor = localStorage.getItem("colorTheme") || "rojo";
+
+        const applyTheme = (theme) => {
+            currentTheme = theme;
+            if (theme === "dark") {
+                document.body.classList.add("dark-theme");
+                document.body.classList.remove("light-theme");
+                document.getElementById('themeToggle').checked = true;
+            } else {
+                document.body.classList.add("light-theme");
+                document.body.classList.remove("dark-theme");
+                document.getElementById('themeToggle').checked = false;
+            }
+            localStorage.setItem("theme", theme);
+        }
+
+        const applyColorTheme = (color) => {
+            currentColor = color;
+            document.body.classList.remove("rojo", "verde", "azul");
+            document.body.classList.add(color);
+            localStorage.setItem("colorTheme", color);
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-color="${color}"]`).classList.add('active');
+        }
+
+        // Funciones de modal
+        const openNewsModal = () => {
+            document.getElementById('newsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Recargar novedades cada vez que se abre el modal
+            loadNews();
+        }
+
+        const closeNewsModal = () => {
+            document.getElementById('newsModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Inicializar tema al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(currentTheme);
+            applyColorTheme(currentColor);
+        });
+
+        window.registerUser = registerUser;
+        window.loginUser = loginUser;
+        window.logoutUser = logoutUser;
+        window.applyTheme = applyTheme;
+        window.applyColorTheme = applyColorTheme;
+        window.showSection = (sectionId) => {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Actualizar navegación activa
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            const navLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (navLink) navLink.classList.add('active');
+            
+            // Cerrar sidebar en móvil
+            if (window.innerWidth <= 768) {
+                document.getElementById('appSidebar').classList.remove('active');
+            }
+        };
+        window.openNewsModal = openNewsModal;
+        window.closeNewsModal = closeNewsModal;
+        window.getCategoryName = getCategoryName;
+    </script>
+</head>
+<body class="light-theme rojo">
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="app-logo">
+                <h1>🤍L,C🤍</h1>
+                <p>Bienvenida a tu aplicación personal</p>
+            </div>
+            
+            <div id="registerForm" class="form-group">
+                <h3>Crear cuenta</h3>
+                <input type="email" id="registerEmail" placeholder="Correo electrónico" class="rounded-input" />
+                <input type="password" id="registerPassword" placeholder="Contraseña" class="rounded-input" />
+                <button id="btnRegister" onclick="registerUser(registerEmail.value, registerPassword.value)" class="rounded-btn primary-btn">Registrarse</button>
+            </div>
+
+            <div class="separator">
+                <span>o</span>
+            </div>
+
+            <div id="loginForm" class="form-group">
+                <h3>Iniciar sesión</h3>
+                <input type="email" id="loginEmail" placeholder="Correo electrónico" class="rounded-input" />
+                <input type="password" id="loginPassword" placeholder="Contraseña" class="rounded-input" />
+                <button id="btnLogin" onclick="loginUser(loginEmail.value, loginPassword.value)" class="rounded-btn secondary-btn">Iniciar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <button id="sidebarToggle" onclick="document.getElementById('appSidebar').classList.toggle('active')" class="menu-btn">☰</button>
+            <div class="header-title">
+                <h2 id="welcomeName">¡Bienvenida!</h2>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <div id="appSidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>🤍L,C🤍</h3>
+                <p>Menú de navegación</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#inicioSection" class="nav-link active" onclick="showSection('inicioSection')">🏠 Inicio</a></li>
+                <li><a href="#ajustesSection" class="nav-link" onclick="showSection('ajustesSection')">⚙️ Ajustes</a></li>
+                <li><a href="#" class="nav-link" onclick="openNewsModal()">📢 Novedades</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button onclick="logoutUser()" class="rounded-btn logout-btn">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <!-- Modal de Novedades -->
+        <div id="newsModal" class="news-modal">
+            <div class="news-modal-content">
+                <div class="news-modal-header">
+                    <h2>📢 Últimas Novedades</h2>
+                    <button class="close-modal-btn" onclick="closeNewsModal()">×</button>
+                </div>
+                <div class="news-modal-body">
+                    <div id="loadingNews" class="loading-news">
+                        <p>Cargando novedades...</p>
+                    </div>
+                    <div id="newsContainer" class="news-container">
+                        <!-- Las novedades se cargarán aquí desde Firebase -->
+                    </div>
+                </div>
+                <div class="news-modal-footer">
+                    <p>Las novedades se actualizan automáticamente desde la base de datos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div id="mainContent">
+            <!-- Sección Inicio -->
+            <section id="inicioSection" class="content-section active">
+                <div class="section-header">
+                    <h2>📱 Panel Principal</h2>
+                    <p>Información general y accesos directos</p>
+                </div>
+                
+                <div class="user-info-card">
+                    <div class="info-header">
+                        <div class="avatar">👤</div>
+                        <div>
+                            <h3>Información de la cuenta</h3>
+                            <p id="userEmail">correo@ejemplo.com</p>
+                        </div>
+                    </div>
+                    <div class="info-body">
+                        <div class="info-item">
+                            <span>📅</span>
+                            <div>
+                                <p class="info-label">Miembro desde</p>
+                                <p id="userSince" class="info-value">Hoy</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span>🔐</span>
+                            <div>
+                                <p class="info-label">Estado</p>
+                                <p class="info-value">Activo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-access">
+                    <h3>🔗 Accesos Directos</h3>
+                    <div class="quick-cards">
+                        <div class="quick-card" onclick="showSection('ajustesSection')">
+                            <div class="quick-icon">⚙️</div>
+                            <h4>Ajustes</h4>
+                            <p>Configura tu aplicación</p>
+                        </div>
+                        <div class="quick-card" onclick="openNewsModal()">
+                            <div class="quick-icon">📢</div>
+                            <h4>Novedades</h4>
+                            <p>Ver últimas actualizaciones</p>
+                        </div>
+                        <div class="quick-card" onclick="alert('Función en desarrollo')">
+                            <div class="quick-icon">🔔</div>
+                            <h4>Notificaciones</h4>
+                            <p>Ver alertas</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Ajustes -->
+            <section id="ajustesSection" class="content-section">
+                <div class="section-header">
+                    <h2>⚙️ Configuración</h2>
+                    <p>Personaliza tu experiencia</p>
+                </div>
+
+                <div class="settings-cards">
+                    <div class="settings-card">
+                        <h3>🎨 Apariencia</h3>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <strong>Modo Oscuro/Claro</strong>
+                                <p>Cambia entre temas claro y oscuro</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="themeToggle" onchange="applyTheme(this.checked ? 'dark' : 'light')" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <strong>Color de Tema</strong>
+                                <p>Elige tu color preferido</p>
+                            </div>
+                            <div class="color-selector">
+                                <button onclick="applyColorTheme('rojo')" data-color="rojo" class="color-btn active" style="background-color: #FF3366;">
+                                    Rojo
+                                </button>
+                                <button onclick="applyColorTheme('verde')" data-color="verde" class="color-btn" style="background-color: #00CC88;">
+                                    Verde
+                                </button>
+                                <button onclick="applyColorTheme('azul')" data-color="azul" class="color-btn" style="background-color: #0066FF;">
+                                    Azul
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>👤 Cuenta</h3>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <strong>Información de la cuenta</strong>
+                                <p>Gestiona tu perfil y preferencias</p>
+                            </div>
+                            <button class="rounded-btn" onclick="alert('Editar perfil en desarrollo')">
+                                Editar Perfil
+                            </button>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <strong>Novedades</strong>
+                                <p>Ver últimas actualizaciones</p>
+                            </div>
+                            <button class="rounded-btn" onclick="openNewsModal()">
+                                Ver Novedades
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
