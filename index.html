@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC - App Personal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-theme red">
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <i class="fas fa-heart splash-heart left"></i>
+                <span class="brand-name splash-brand">LC</span>
+                <i class="fas fa-heart splash-heart right"></i>
+            </div>
+            <div class="splash-spinner">
+                <div class="splash-ring"></div>
+            </div>
+            <p class="splash-text">Cargando...</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE REGISTRO -->
+    <div id="registerScreen" class="auth-container hidden">
+        <div class="auth-card">
+            <button class="auth-back-btn" onclick="goToLogin()">
+                <i class="fas fa-arrow-left"></i> Regresar al inicio
+            </button>
+            
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-heart"></i>
+                        <span class="brand-name">LC</span>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h1>Crear Cuenta</h1>
+                    <p class="auth-subtitle">Únete a nuestra comunidad</p>
+                </div>
+            </div>
+            
+            <div id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerUsername" placeholder="Nombre de usuario" autocomplete="username" />
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" placeholder="Correo electrónico" autocomplete="email" />
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password" />
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña" autocomplete="new-password" />
+                    </div>
+                    <button id="btnRegister" class="btn-primary" onclick="window.app && window.app.registerUser()">
+                        <i class="fas fa-user-plus"></i> Crear cuenta
+                    </button>
+                    <p class="form-hint">Se generará un ID único automáticamente</p>
+                </div>
+            </div>
+
+            <div class="auth-divider">
+                <span>¿Ya tienes cuenta?</span>
+            </div>
+
+            <button onclick="goToLogin()" class="btn-secondary">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="auth-container hidden">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-heart"></i>
+                        <span class="brand-name">LC</span>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h1>Bienvenido</h1>
+                    <p class="auth-subtitle">Inicia sesión en tu cuenta</p>
+                </div>
+            </div>
+            
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Correo electrónico" autocomplete="email" />
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password" />
+                    </div>
+                    <!-- NUEVO: Enlace de recuperar contraseña -->
+                    <div class="forgot-password-container">
+                        <button class="btn-link" onclick="window.app && window.app.openForgotPasswordModal()">
+                            <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                        </button>
+                    </div>
+                    <button id="btnLogin" class="btn-primary" onclick="window.app && window.app.loginUser()">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                </div>
+            </div>
+
+            <div class="auth-divider">
+                <span>¿Primera vez aquí?</span>
+            </div>
+
+            <button onclick="goToRegister()" class="btn-secondary">
+                <i class="fas fa-user-plus"></i> Crear nueva cuenta
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: Recuperar Contraseña -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content" style="max-width:400px">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Recuperar Contraseña</h3>
+                <button class="modal-close-btn" onclick="window.app && window.app.closeForgotPasswordModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">
+                    Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+                </p>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="resetEmail" placeholder="Correo electrónico" autocomplete="email" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.app && window.app.closeForgotPasswordModal()">
+                    Cancelar
+                </button>
+                <button class="btn-primary" onclick="window.app && window.app.sendPasswordReset()">
+                    <i class="fas fa-paper-plane"></i> Enviar enlace
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-container">
+                <button id="sidebarToggle" class="header-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">
+                    <h1 id="welcomeName">Bienvenido</h1>
+                    <div class="header-user-info">
+                        <!-- MEJORADO: click en ID para copiar con feedback visual -->
+                        <span id="userIdDisplay" class="user-id-badge copyable-id" onclick="window.app && window.app.copyUserId()" title="Clic para copiar ID">
+                            <i class="fas fa-id-card"></i> <span id="userIdText">#00000</span>
+                            <i class="fas fa-copy copy-icon-small"></i>
+                        </span>
+                        <span class="user-status-indicator active"></span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-action-btn notification-btn" onclick="app.openNotificationsModal()" title="Notificaciones">
+                        <i class="fas fa-bell"></i>
+                        <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    </button>
+                    <button class="header-action-btn theme-toggle-btn" onclick="app.toggleTheme()" title="Cambiar tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <div id="appSidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-heart"></i>
+                        <span class="brand-name">LC</span>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <p>Aplicación Personal</p>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li>
+                        <a href="#" class="nav-item active" onclick="app.showSection('inicioSection')">
+                            <i class="fas fa-home"></i>
+                            <span>Inicio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" onclick="app.showSection('amigosSection')">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Amigos</span>
+                            <span id="friendRequestsBadge" class="nav-badge hidden">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" onclick="app.showSection('calendarioSection')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Calendario</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" onclick="app.showSection('ajustesSection')">
+                            <i class="fas fa-cog"></i>
+                            <span>Ajustes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" onclick="app.openNewsModal()">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Novedades</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile-mini">
+                    <div class="user-avatar-mini" id="sidebarUserAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info-mini">
+                        <span id="miniUsername">Usuario</span>
+                        <span id="miniUserEmail" class="user-email-mini">usuario@correo.com</span>
+                    </div>
+                </div>
+                <button onclick="app.logoutUser()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal de Notificaciones -->
+        <div id="notificationsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-bell"></i> Notificaciones</h3>
+                    <button class="modal-close-btn" onclick="app.closeNotificationsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="notificationsLoading" class="loading-state">
+                        <!-- Skeleton loaders -->
+                        <div class="skeleton-list">
+                            <div class="skeleton-item">
+                                <div class="skeleton skeleton-icon"></div>
+                                <div class="skeleton-lines">
+                                    <div class="skeleton skeleton-line short"></div>
+                                    <div class="skeleton skeleton-line long"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-item">
+                                <div class="skeleton skeleton-icon"></div>
+                                <div class="skeleton-lines">
+                                    <div class="skeleton skeleton-line short"></div>
+                                    <div class="skeleton skeleton-line long"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-item">
+                                <div class="skeleton skeleton-icon"></div>
+                                <div class="skeleton-lines">
+                                    <div class="skeleton skeleton-line short"></div>
+                                    <div class="skeleton skeleton-line medium"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="notificationsList" class="notifications-list">
+                        <!-- Notificaciones se cargan aquí -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="app.markAllNotificationsAsRead()">
+                        <i class="fas fa-check-double"></i> Marcar todas como leídas
+                    </button>
+                    <button class="btn-danger" onclick="app.clearAllNotifications()">
+                        <i class="fas fa-trash"></i> Eliminar todas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Novedades -->
+        <div id="newsModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><i class="fas fa-bullhorn"></i> Últimas Novedades</h3>
+                    <div class="modal-header-actions">
+                        <button class="btn-text" onclick="app.refreshNews()" title="Refrescar">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="modal-close-btn" onclick="app.closeNewsModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="loadingNews" class="loading-state">
+                        <div class="skeleton-list">
+                            <div class="skeleton skeleton-line short" style="width:40%;height:24px;margin-bottom:16px"></div>
+                            <div class="skeleton skeleton-line long"></div>
+                            <div class="skeleton skeleton-line long"></div>
+                            <div class="skeleton skeleton-line medium"></div>
+                        </div>
+                    </div>
+                    <div id="newsContainer" class="news-container">
+                        <!-- UN SOLO CARD por versión se carga aquí -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="news-stats">
+                        <span id="newsCount">0</span> versión
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Día (Calendario) -->
+        <div id="dayModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3 id="dayModalTitle"><i class="fas fa-calendar-day"></i> Contenido del día</h3>
+                    <button class="modal-close-btn" onclick="app.closeDayModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Loading skeleton -->
+                    <div id="dayModalLoading" class="loading-state">
+                        <div class="skeleton-list">
+                            <div class="skeleton skeleton-line short" style="width:60%;height:22px;margin-bottom:12px"></div>
+                            <div class="skeleton skeleton-line long"></div>
+                            <div class="skeleton skeleton-line long"></div>
+                            <div class="skeleton skeleton-line medium"></div>
+                            <div class="skeleton skeleton-line long" style="margin-top:20px"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- CONTENIDO BLOQUEADO PARA DÍAS FUTUROS -->
+                    <div id="dayModalBlocked" class="day-blocked-container hidden">
+                        <div class="blocked-content">
+                            <div class="blocked-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h4>Contenido Bloqueado</h4>
+                            <p>Este día aún no está disponible. El contenido se desbloqueará cuando llegue la fecha.</p>
+                            <div class="countdown">
+                                <i class="fas fa-clock"></i>
+                                <span id="unlockCountdown">Disponible próximamente</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CONTENIDO DESBLOQUEADO -->
+                    <div id="dayModalContent" class="day-content-container hidden">
+                        <div class="day-content-main" id="dayContentMain"></div>
+                        <div class="day-content-details hidden" id="dayContentDetails"></div>
+                    </div>
+
+                    <!-- SECCIÓN DE COMENTARIOS -->
+                    <div id="dayCommentsSection" class="day-comments-section hidden">
+                        <div class="section-title">
+                            <h4><i class="fas fa-comments"></i> Comentarios</h4>
+                            <span id="commentsCount" class="badge">0</span>
+                        </div>
+                        
+                        <div class="comments-container">
+                            <div id="dayCommentsList" class="comments-list"></div>
+                            
+                            <div class="add-comment-form" id="addCommentForm">
+                                <div class="comment-input-container">
+                                    <div class="user-avatar-small" id="commentUserAvatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <textarea 
+                                        id="dayCommentText" 
+                                        placeholder="Escribe tu comentario..." 
+                                        rows="3"
+                                        maxlength="500"
+                                        oninput="app.updateCharCount()"
+                                    ></textarea>
+                                </div>
+                                <div class="comment-actions">
+                                    <div class="char-counter">
+                                        <span id="charCount">0</span>/500
+                                    </div>
+                                    <button class="btn-primary" onclick="app.postDayComment()" id="postCommentBtn">
+                                        <i class="fas fa-paper-plane"></i> Publicar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeDayModal()">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Cambiar Username -->
+        <div id="changeUsernameModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario</h3>
+                    <button class="modal-close-btn" onclick="app.closeChangeUsernameModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="newUsername" placeholder="Nuevo nombre de usuario" />
+                        </div>
+                        <p class="form-hint">Tu nuevo nombre será visible para otros usuarios</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeChangeUsernameModal()">
+                        Cancelar
+                    </button>
+                    <button class="btn-primary" onclick="app.saveNewUsername()">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Cambiar Contraseña -->
+        <div id="changePasswordModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+                    <button class="modal-close-btn" onclick="app.closeChangePasswordModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="currentPassword" placeholder="Contraseña actual" />
+                        </div>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="newPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)" />
+                        </div>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmNewPassword" placeholder="Confirmar nueva contraseña" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeChangePasswordModal()">
+                        Cancelar
+                    </button>
+                    <button class="btn-primary" onclick="app.saveNewPassword()">
+                        <i class="fas fa-save"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Cambiar Email -->
+        <div id="changeEmailModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-envelope"></i> Cambiar Email</h3>
+                    <button class="modal-close-btn" onclick="app.closeChangeEmailModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="newEmail" placeholder="Nuevo correo electrónico" />
+                        </div>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="emailPassword" placeholder="Tu contraseña actual" />
+                        </div>
+                        <p class="form-hint">Recibirás un email de verificación en la nueva dirección</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeChangeEmailModal()">
+                        Cancelar
+                    </button>
+                    <button class="btn-primary" onclick="app.saveNewEmail()">
+                        <i class="fas fa-save"></i> Cambiar Email
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Eliminar Cuenta -->
+        <div id="deleteAccountModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Eliminar Cuenta</h3>
+                    <button class="modal-close-btn" onclick="app.closeDeleteAccountModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="warning-box">
+                        <div class="warning-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="warning-content">
+                            <h4>¡Atención! Esta acción es irreversible</h4>
+                            <p>Al eliminar tu cuenta:</p>
+                            <ul>
+                                <li>Todos tus datos serán eliminados permanentemente</li>
+                                <li>Perderás acceso a todo el contenido</li>
+                                <li>No podrás recuperar tu ID de usuario</li>
+                                <li>Se eliminarán todos tus comentarios y amigos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="deleteAccountPassword" placeholder="Ingresa tu contraseña para confirmar" />
+                        </div>
+                        <div class="input-with-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <input type="text" id="deleteConfirmText" placeholder='Escribe "ELIMINAR" para confirmar' />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeDeleteAccountModal()">
+                        Cancelar
+                    </button>
+                    <button class="btn-danger" onclick="app.deleteAccount()">
+                        <i class="fas fa-trash"></i> Eliminar Cuenta Permanentemente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Avatar/Foto de Perfil -->
+        <div id="avatarModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-circle"></i> Cambiar Foto de Perfil</h3>
+                    <button class="modal-close-btn" onclick="app.closeAvatarModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="avatar-preview-section">
+                        <h4>Vista Previa</h4>
+                        <div class="avatar-preview-container">
+                            <div id="avatarPreview" class="avatar-preview-large">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="avatar-current-info">
+                                <p>Avatar actual:</p>
+                                <span id="currentAvatarType">Inicial del nombre</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="avatar-options-section">
+                        <h4>Opciones</h4>
+                        
+                        <div class="avatar-option">
+                            <div class="avatar-option-header">
+                                <i class="fas fa-user"></i>
+                                <h5>Inicial del nombre</h5>
+                            </div>
+                            <p>Mostrar la primera letra de tu nombre en un círculo de color</p>
+                            <button class="btn-secondary" onclick="app.setAvatarType('initial')">
+                                <i class="fas fa-check"></i> Usar inicial
+                            </button>
+                        </div>
+                        
+                        <div class="avatar-option">
+                            <div class="avatar-option-header">
+                                <i class="fas fa-smile"></i>
+                                <h5>Emoji</h5>
+                            </div>
+                            <p>Selecciona un emoji como tu avatar</p>
+                            <div class="emoji-selector">
+                                <input type="text" id="emojiInput" placeholder="Pega un emoji aquí..." maxlength="2" />
+                                <div class="emoji-suggestions">
+                                    <span onclick="app.setEmoji('😊')">😊</span>
+                                    <span onclick="app.setEmoji('😎')">😎</span>
+                                    <span onclick="app.setEmoji('❤️')">❤️</span>
+                                    <span onclick="app.setEmoji('🌟')">🌟</span>
+                                    <span onclick="app.setEmoji('🎉')">🎉</span>
+                                    <span onclick="app.setEmoji('🔥')">🔥</span>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" onclick="app.setAvatarType('emoji')">
+                                <i class="fas fa-check"></i> Usar emoji
+                            </button>
+                        </div>
+                        
+                        <div class="avatar-option">
+                            <div class="avatar-option-header">
+                                <i class="fas fa-camera"></i>
+                                <h5>Subir foto</h5>
+                            </div>
+                            <p>Sube una imagen desde tu dispositivo (JPG, PNG, max 2MB)</p>
+                            <div class="file-upload-container">
+                                <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/jpg" hidden />
+                                <button class="btn-secondary" onclick="document.getElementById('avatarFileInput').click()">
+                                    <i class="fas fa-upload"></i> Seleccionar imagen
+                                </button>
+                                <div id="selectedFileName" class="file-name-display"></div>
+                            </div>
+                            <button class="btn-primary" onclick="app.uploadAvatarImage()" id="uploadAvatarBtn">
+                                <i class="fas fa-cloud-upload-alt"></i> Subir imagen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeAvatarModal()">
+                        Cancelar
+                    </button>
+                    <button class="btn-danger" onclick="app.removeAvatar()">
+                        <i class="fas fa-trash"></i> Eliminar avatar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div id="mainContent">
+            <!-- Sección Inicio -->
+            <section id="inicioSection" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-home"></i> Panel Principal</h2>
+                    <p>Bienvenido a tu espacio personal</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="welcome-card">
+                        <div class="welcome-card-header">
+                            <div class="user-avatar-large" id="dashboardUserAvatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="welcome-card-body">
+                                <h3 id="dashboardUsername">Usuario</h3>
+                                <p id="dashboardEmail" class="user-email">usuario@correo.com</p>
+                                <div class="user-stats-row">
+                                    <div class="stat-box">
+                                        <i class="fas fa-id-card"></i>
+                                        <div>
+                                            <span class="stat-label">ID de usuario</span>
+                                            <span class="stat-value" id="dashboardUserId">#00000</span>
+                                        </div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <div>
+                                            <span class="stat-label">Miembro desde</span>
+                                            <span class="stat-value" id="dashboardSince">Hoy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="welcome-card-actions">
+                            <button class="btn-secondary" onclick="app.showSection('ajustesSection')">
+                                <i class="fas fa-cog"></i> Configuración
+                            </button>
+                            <!-- MEJORADO: botón copiar con feedback visual integrado -->
+                            <button class="btn-primary" onclick="app.copyUserId()" id="copyUserIdBtn">
+                                <i class="fas fa-copy"></i> <span id="copyBtnText">Copiar mi ID</span>
+                            </button>
+                            <button class="btn-primary" onclick="app.openAvatarModal()">
+                                <i class="fas fa-user-circle"></i> Cambiar avatar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-card">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Accesos Rápidos</h3>
+                        <div class="quick-actions-grid">
+                            <div class="quick-action-item" onclick="app.showSection('calendarioSection')">
+                                <div class="action-icon bg-primary">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <h4>Calendario</h4>
+                                <p>Ver contenido diario</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.showSection('amigosSection')">
+                                <div class="action-icon bg-blue">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <h4>Mis Amigos</h4>
+                                <p>Gestiona contactos</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.openNewsModal()">
+                                <div class="action-icon bg-green">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <h4>Novedades</h4>
+                                <p>Ver actualizaciones</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.openNotificationsModal()">
+                                <div class="action-icon bg-danger">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h4>Notificaciones</h4>
+                                <p>Ver alertas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-content-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Próximo contenido</h3>
+                            <button class="btn-text" onclick="app.showSection('calendarioSection')">
+                                Ver calendario
+                            </button>
+                        </div>
+                        <div id="upcomingContentList" class="content-preview-list">
+                            <!-- Skeleton loader -->
+                            <div class="skeleton-list">
+                                <div class="skeleton-item-row">
+                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
+                                    <div class="skeleton skeleton-line long" style="width:60%"></div>
+                                </div>
+                                <div class="skeleton-item-row">
+                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
+                                    <div class="skeleton skeleton-line long" style="width:55%"></div>
+                                </div>
+                                <div class="skeleton-item-row">
+                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
+                                    <div class="skeleton skeleton-line long" style="width:65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+                            <button class="btn-text" onclick="app.refreshActivity()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div id="recentActivityList" class="activity-list">
+                            <div class="empty-state">
+                                <i class="fas fa-history"></i>
+                                <p>No hay actividad reciente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Amigos -->
+            <section id="amigosSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-friends"></i> Amigos</h2>
+                    <p>Gestiona tus contactos</p>
+                </div>
+
+                <div class="friends-container">
+                    <div class="search-guide">
+                        <div class="guide-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="guide-content">
+                            <h4>¿Cómo agregar amigos?</h4>
+                            <p>Cada usuario tiene un <strong>ID único de 5 dígitos</strong>. Comparte tu ID para que otros te encuentren.</p>
+                            <div class="current-user-id">
+                                <span>Tu ID:</span>
+                                <div class="id-display">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span id="currentUserIdDisplay">00000</span>
+                                    <button class="copy-btn" onclick="app.copyUserId()" title="Copiar ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="search-form">
+                        <div class="search-input-container">
+                            <div class="input-prefix">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="searchUserId" 
+                                placeholder="00000" 
+                                maxlength="5" 
+                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 5)"
+                                autocomplete="off"
+                            />
+                            <div class="input-counter">
+                                <span id="inputLength">0/5</span>
+                            </div>
+                        </div>
+                        <button onclick="app.searchUserById()" class="btn-primary search-submit-btn">
+                            <i class="fas fa-search"></i> Buscar usuario
+                        </button>
+                    </div>
+
+                    <div class="friends-tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" data-tab="friends-list" onclick="app.switchFriendsTab('friends-list')">
+                                <i class="fas fa-users"></i> Mis Amigos
+                                <span id="friendsCountBadge" class="tab-badge">0</span>
+                            </button>
+                            <button class="tab-btn" data-tab="friend-requests" onclick="app.switchFriendsTab('friend-requests')">
+                                <i class="fas fa-user-plus"></i> Solicitudes
+                                <span id="requestsCountBadge" class="tab-badge hidden">0</span>
+                            </button>
+                            <button class="tab-btn" data-tab="sent-requests" onclick="app.switchFriendsTab('sent-requests')">
+                                <i class="fas fa-paper-plane"></i> Enviadas
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            <div id="friends-list" class="tab-pane active">
+                                <div id="friendsListContainer" class="friends-list">
+                                    <!-- Skeleton loader -->
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="friend-requests" class="tab-pane">
+                                <div id="friendRequestsContainer" class="requests-list">
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="sent-requests" class="tab-pane">
+                                <div id="sentRequestsContainer" class="requests-list">
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="searchResults" class="search-results">
+                        <div class="empty-search-state">
+                            <i class="fas fa-search"></i>
+                            <h4>Buscar usuarios</h4>
+                            <p>Ingresa un ID de 5 dígitos para buscar</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Calendario -->
+            <section id="calendarioSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Calendario</h2>
+                    <p>Contenido diario disponible</p>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-controls">
+                        <div class="calendar-controls-left">
+                            <button id="prevMonth" class="calendar-nav-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button id="todayBtn" class="btn-secondary" onclick="app.goToToday()">
+                                <i class="fas fa-calendar-day"></i> Hoy
+                            </button>
+                        </div>
+                        
+                        <div class="calendar-current-month">
+                            <h3 id="currentMonth">Enero 2026</h3>
+                            <p id="currentWeek">Semana actual</p>
+                        </div>
+                        
+                        <div class="calendar-controls-right">
+                            <button id="nextMonth" class="calendar-nav-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-wrapper">
+                        <div class="calendar-weekdays">
+                            <div>Lun</div>
+                            <div>Mar</div>
+                            <div>Mié</div>
+                            <div>Jue</div>
+                            <div>Vie</div>
+                            <div>Sáb</div>
+                            <div>Dom</div>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid">
+                            <!-- Calendario se genera aquí -->
+                        </div>
+                    </div>
+
+                    <div class="calendar-footer">
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <div class="legend-color today"></div>
+                                <span>Hoy</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color has-content"></div>
+                                <span>Con contenido</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color future"></div>
+                                <span>Días futuros (bloqueados)</span>
+                            </div>
+                        </div>
+                        <div class="calendar-note">
+                            <p><i class="fas fa-info-circle"></i> Haz clic en un día para ver su contenido</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Ajustes -->
+            <section id="ajustesSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cog"></i> Configuración</h2>
+                    <p>Personaliza tu experiencia</p>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-grid">
+                        <!-- Apariencia -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <h3>Apariencia</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Modo oscuro/claro</h4>
+                                        <p>Cambia entre temas claro y oscuro</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="themeToggle" />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Color de tema</h4>
+                                        <p>Elige tu color preferido</p>
+                                    </div>
+                                    <div class="color-picker">
+                                        <button onclick="app.applyColorTheme('red')" data-color="red" 
+                                                class="color-option active">
+                                            <div class="color-dot bg-red"></div>
+                                            <span>Rojo</span>
+                                        </button>
+                                        <button onclick="app.applyColorTheme('blue')" data-color="blue" 
+                                                class="color-option">
+                                            <div class="color-dot bg-blue"></div>
+                                            <span>Azul</span>
+                                        </button>
+                                        <button onclick="app.applyColorTheme('green')" data-color="green" 
+                                                class="color-option">
+                                            <div class="color-dot bg-green"></div>
+                                            <span>Verde</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avatar y Perfil -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <h3>Avatar y Perfil</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Foto de perfil / Avatar</h4>
+                                        <p>Cambia tu imagen, emoji o inicial</p>
+                                    </div>
+                                    <button class="btn-primary" onclick="app.openAvatarModal()">
+                                        <i class="fas fa-user-edit"></i> Cambiar avatar
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Nombre de usuario</h4>
+                                        <p>Cambia tu nombre visible</p>
+                                    </div>
+                                    <button class="btn-primary" onclick="app.openChangeUsernameModal()">
+                                        <i class="fas fa-edit"></i> Cambiar
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Cambiar contraseña</h4>
+                                        <p>Actualiza tu contraseña de acceso</p>
+                                    </div>
+                                    <button class="btn-primary" onclick="app.openChangePasswordModal()">
+                                        <i class="fas fa-key"></i> Cambiar
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Correo electrónico</h4>
+                                        <p>Actualiza tu dirección de correo</p>
+                                    </div>
+                                    <button class="btn-primary" onclick="app.openChangeEmailModal()">
+                                        <i class="fas fa-envelope"></i> Cambiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificaciones -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h3>Notificaciones</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Solicitudes de amistad</h4>
+                                        <p>Notificaciones de nuevas solicitudes</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notifFriendRequests" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Novedades</h4>
+                                        <p>Notificaciones de actualizaciones</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notifNews" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Respuestas</h4>
+                                        <p>Notificaciones de comentarios</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notifComments" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Sonido de notificaciones</h4>
+                                        <p>Reproducir sonido al recibir</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notifSound" checked />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cuenta -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <h3>Cuenta</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Eliminar cuenta</h4>
+                                        <p>Elimina tu cuenta permanentemente</p>
+                                    </div>
+                                    <button class="btn-danger" onclick="app.openDeleteAccountModal()">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Exportar datos</h4>
+                                        <p>Descarga tus datos personales</p>
+                                    </div>
+                                    <button class="btn-secondary" onclick="app.exportUserData()">
+                                        <i class="fas fa-download"></i> Exportar
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Actualizar aplicación</h4>
+                                        <p>Verifica si hay actualizaciones</p>
+                                    </div>
+                                    <button class="btn-secondary" onclick="app.checkForUpdates()">
+                                        <i class="fas fa-sync"></i> Verificar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <h3>Información</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="info-item">
+                                    <i class="fas fa-code"></i>
+                                    <div>
+                                        <p class="info-label">Versión de la aplicación</p>
+                                        <p class="info-value">v1.3.0</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-database"></i>
+                                    <div>
+                                        <p class="info-label">Base de datos</p>
+                                        <p class="info-value">Firebase v9.6.0</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <div>
+                                        <p class="info-label">Última actualización</p>
+                                        <p class="info-value">Febrero 2026</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-shield"></i>
+                                    <div>
+                                        <p class="info-label">Seguridad</p>
+                                        <p class="info-value">SSL/TLS activado</p>
+                                    </div>
+                                </div>
+                                <div class="settings-actions">
+                                    <button class="btn-primary" onclick="app.refreshApp()">
+                                        <i class="fas fa-sync"></i> Recargar aplicación
+                                    </button>
+                                    <button class="btn-secondary" onclick="app.showHelp()">
+                                        <i class="fas fa-question-circle"></i> Ayuda
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Modal de Ayuda -->
+        <div id="helpModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><i class="fas fa-question-circle"></i> Ayuda — LC App</h3>
+                    <button class="modal-close-btn" onclick="app.closeHelpModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-grid">
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-compass"></i></div>
+                            <div class="help-card-body">
+                                <h4>Navegación</h4>
+                                <ul class="help-list">
+                                    <li>Usa el menú lateral para cambiar entre secciones</li>
+                                    <li>En móvil, toca <strong>☰</strong> para abrir el menú</li>
+                                    <li>El botón de luna/sol cambia entre tema claro y oscuro</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-user-friends"></i></div>
+                            <div class="help-card-body">
+                                <h4>Amigos</h4>
+                                <ul class="help-list">
+                                    <li>Comparte tu <strong>ID de 5 dígitos</strong> para que te encuentren</li>
+                                    <li>Busca amigos ingresando su ID en la sección Amigos</li>
+                                    <li>Gestiona solicitudes recibidas en la pestaña "Solicitudes"</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="help-card-body">
+                                <h4>Calendario</h4>
+                                <ul class="help-list">
+                                    <li>Los días <span class="help-tag green">verdes</span> tienen contenido disponible</li>
+                                    <li>Los días <span class="help-tag gray">grises</span> son futuros y están bloqueados</li>
+                                    <li>El día <span class="help-tag primary">resaltado</span> es el día de hoy</li>
+                                    <li>Haz clic en cualquier día para ver su contenido</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-comment-dots"></i></div>
+                            <div class="help-card-body">
+                                <h4>Comentarios</h4>
+                                <ul class="help-list">
+                                    <li>Puedes comentar en los días desbloqueados</li>
+                                    <li>Los comentarios son visibles para otros usuarios</li>
+                                    <li>Máximo <strong>500 caracteres</strong> por comentario</li>
+                                    <li>Puedes dar ❤️ Me gusta a comentarios de otros</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-bell"></i></div>
+                            <div class="help-card-body">
+                                <h4>Notificaciones</h4>
+                                <ul class="help-list">
+                                    <li>Recibe alertas de nuevas solicitudes de amistad</li>
+                                    <li>Marca como leídas o elimínalas cuando quieras</li>
+                                    <li>Configura qué notificaciones recibir en Ajustes</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-card">
+                            <div class="help-card-icon"><i class="fas fa-sliders-h"></i></div>
+                            <div class="help-card-body">
+                                <h4>Ajustes</h4>
+                                <ul class="help-list">
+                                    <li>Cambia tu nombre, correo o contraseña</li>
+                                    <li>Elige entre tema <strong>claro/oscuro</strong></li>
+                                    <li>Selecciona tu color favorito: rojo, azul o verde</li>
+                                    <li>Cambia tu foto de perfil o usa un emoji</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="help-footer-note">
+                        <i class="fas fa-envelope"></i>
+                        <span>¿Necesitas más ayuda? Contacta con soporte a través de tu correo registrado.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="app.closeHelpModal()">
+                        <i class="fas fa-check"></i> Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Política de Privacidad -->
+        <div id="privacyModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><i class="fas fa-shield-alt"></i> Política de Privacidad</h3>
+                    <button class="modal-close-btn" onclick="document.getElementById('privacyModal').classList.remove('active'); document.body.style.overflow='auto';">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="policy-content">
+                        <div class="policy-section">
+                            <h4><i class="fas fa-database"></i> 1. Datos que recopilamos</h4>
+                            <ul class="help-list">
+                                <li>Nombre de usuario e email al registrarte</li>
+                                <li>Comentarios que publicas en el calendario</li>
+                                <li>Listas de amigos y solicitudes enviadas</li>
+                                <li>Preferencias de tema y configuración</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-cogs"></i> 2. Cómo usamos tus datos</h4>
+                            <ul class="help-list">
+                                <li>Para identificarte dentro de la app</li>
+                                <li>Para que otros usuarios puedan encontrarte por ID</li>
+                                <li>Para enviarte notificaciones dentro de la app</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-cloud"></i> 3. Almacenamiento</h4>
+                            <ul class="help-list">
+                                <li>Tus datos se guardan en Firebase (Google)</li>
+                                <li>Las contraseñas nunca se almacenan en texto plano</li>
+                                <li>Puedes exportar o eliminar tus datos en cualquier momento</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-user-shield"></i> 4. Tus derechos</h4>
+                            <ul class="help-list">
+                                <li>Puedes cambiar tu información en Ajustes</li>
+                                <li>Puedes exportar todos tus datos</li>
+                                <li>Puedes eliminar tu cuenta permanentemente</li>
+                            </ul>
+                        </div>
+                        <p class="policy-note"><i class="fas fa-envelope"></i> Para más información, contacta al administrador de la app.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="document.getElementById('privacyModal').classList.remove('active'); document.body.style.overflow='auto';">
+                        <i class="fas fa-check"></i> Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Términos de Uso -->
+        <div id="termsModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-contract"></i> Términos de Uso</h3>
+                    <button class="modal-close-btn" onclick="document.getElementById('termsModal').classList.remove('active'); document.body.style.overflow='auto';">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="policy-content">
+                        <div class="policy-section">
+                            <h4><i class="fas fa-thumbs-up"></i> 1. Uso aceptable</h4>
+                            <ul class="help-list">
+                                <li>Esta app es de uso personal y privado</li>
+                                <li>No está permitido el spam ni el acoso a otros usuarios</li>
+                                <li>Los comentarios deben ser respetuosos</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-user"></i> 2. Cuenta</h4>
+                            <ul class="help-list">
+                                <li>Eres responsable de mantener tu contraseña segura</li>
+                                <li>No compartas tu cuenta con otras personas</li>
+                                <li>Tu ID de 5 dígitos es único e irrecuperable</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-file-alt"></i> 3. Contenido</h4>
+                            <ul class="help-list">
+                                <li>El contenido del calendario es creado por el administrador</li>
+                                <li>Los comentarios son visibles para todos los usuarios</li>
+                                <li>Nos reservamos el derecho de eliminar contenido inapropiado</li>
+                            </ul>
+                        </div>
+                        <div class="policy-section">
+                            <h4><i class="fas fa-exclamation-circle"></i> 4. Limitaciones</h4>
+                            <ul class="help-list">
+                                <li>La app se proporciona "tal cual", sin garantías</li>
+                                <li>No somos responsables de pérdida de datos por mal uso</li>
+                            </ul>
+                        </div>
+                        <p class="policy-note"><i class="fas fa-info-circle"></i> Al usar la app, aceptas estos términos.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="document.getElementById('termsModal').classList.remove('active'); document.body.style.overflow='auto';">
+                        <i class="fas fa-check"></i> Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content" style="max-width:380px">
+                <div class="modal-header">
+                    <h3 id="confirmModalTitle"><i class="fas fa-question-circle"></i> Confirmar</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmModalMessage" style="color:var(--text-color);line-height:1.6;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="confirmModalCancel">Cancelar</button>
+                    <button class="btn-danger" id="confirmModalAccept">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-heart"></i>
+                        <span class="brand-name">LC</span>
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <p>Aplicación Personal v1.3.0</p>
+                </div>
+                <div class="footer-info">
+                    <p>&copy; <span id="currentYear">2026</span> - Todos los derechos reservados</p>
+                    <div class="footer-links">
+                        <a href="#" onclick="app.showHelp()">Ayuda</a>
+                        <a href="#" onclick="app.showPrivacyPolicy()">Privacidad</a>
+                        <a href="#" onclick="app.showTerms()">Términos</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+<script type="module">
+    // ===== FIREBASE CONFIGURACIÓN =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged, 
+        signOut, 
+        updateProfile, 
+        updatePassword, 
+        updateEmail, 
+        deleteUser, 
+        reauthenticateWithCredential, 
+        EmailAuthProvider,
+        sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        getDocs, 
+        query, 
+        orderBy, 
+        where, 
+        doc, 
+        setDoc, 
+        getDoc, 
+        updateDoc, 
+        deleteDoc, 
+        serverTimestamp, 
+        writeBatch,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+    import { 
+        getStorage, 
+        ref, 
+        uploadBytes, 
+        getDownloadURL,
+        deleteObject 
+    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA3OPY_DxVK7GtLT4mgCP5UpDyk5osQsNY",
+        authDomain: "l-clucia.firebaseapp.com",
+        projectId: "l-clucia",
+        storageBucket: "l-clucia.firebasestorage.app",
+        messagingSenderId: "129492728249",
+        appId: "1:129492728249:web:621ec83c2482d12bb71e68"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    window.firebase = {
+        app,
+        auth,
+        firestore: db,
+        storage,
+        firebaseModules: {
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            updateProfile,
+            signOut,
+            updatePassword,
+            updateEmail,
+            deleteUser,
+            reauthenticateWithCredential,
+            EmailAuthProvider,
+            sendPasswordResetEmail,
+            collection,
+            addDoc,
+            getDocs,
+            query,
+            orderBy,
+            where,
+            doc,
+            setDoc,
+            getDoc,
+            updateDoc,
+            deleteDoc,
+            serverTimestamp,
+            writeBatch,
+            onSnapshot,
+            ref,
+            uploadBytes,
+            getDownloadURL,
+            deleteObject
+        }
+    };
+
+    console.log("Firebase inicializado correctamente");
+
+    window.firebaseReady = true;
+    document.dispatchEvent(new CustomEvent('firebaseReady'));
+</script>
+    <script>
+        window.goToRegister = function() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+        };
+        
+        window.goToLogin = function() {
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        };
+
+        function loadAppScript() {
+            const script = document.createElement('script');
+            script.src = 'index.js';
+            script.onerror = function() {
+                console.error('No se pudo cargar index.js');
+            };
+            document.body.appendChild(script);
+        }
+
+        if (window.firebaseReady) {
+            loadAppScript();
+        } else {
+            document.addEventListener('firebaseReady', loadAppScript, { once: true });
+        }
+    </script>
+</body>
+</html>
