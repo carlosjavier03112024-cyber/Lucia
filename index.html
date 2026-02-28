@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC - App Personal</title>
+    <title id="pageTitle">LC - App Personal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,9 +13,9 @@
     <div id="splashScreen" class="splash-screen">
         <div class="splash-content">
             <div class="splash-logo">
-                <i class="fas fa-heart splash-heart left"></i>
-                <span class="brand-name splash-brand">LC</span>
-                <i class="fas fa-heart splash-heart right"></i>
+                <div class="splash-brand-circle">
+                    <span class="brand-name splash-brand" id="splashBrandName"></span>
+                </div>
             </div>
             <div class="splash-spinner">
                 <div class="splash-ring"></div>
@@ -30,19 +30,15 @@
             <button class="auth-back-btn" onclick="goToLogin()">
                 <i class="fas fa-arrow-left"></i> Regresar al inicio
             </button>
-            
             <div class="auth-header">
                 <div class="auth-logo">
                     <div class="logo-icon">
-                        <i class="fas fa-heart"></i>
-                        <span class="brand-name">LC</span>
-                        <i class="fas fa-heart"></i>
+                        <span class="brand-name" id="registerBrandName">LC</span>
                     </div>
                     <h1>Crear Cuenta</h1>
                     <p class="auth-subtitle">Únete a nuestra comunidad</p>
                 </div>
             </div>
-            
             <div id="registerForm" class="auth-form">
                 <div class="form-group">
                     <div class="input-with-icon">
@@ -56,10 +52,12 @@
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="registerPassword" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="registerPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                     </div>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="registerConfirmPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                     </div>
                     <button id="btnRegister" class="btn-primary" onclick="window.app && window.app.registerUser()">
                         <i class="fas fa-user-plus"></i> Crear cuenta
@@ -67,11 +65,7 @@
                     <p class="form-hint">Se generará un ID único automáticamente</p>
                 </div>
             </div>
-
-            <div class="auth-divider">
-                <span>¿Ya tienes cuenta?</span>
-            </div>
-
+            <div class="auth-divider"><span>¿Ya tienes cuenta?</span></div>
             <button onclick="goToLogin()" class="btn-secondary">
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
@@ -84,15 +78,12 @@
             <div class="auth-header">
                 <div class="auth-logo">
                     <div class="logo-icon">
-                        <i class="fas fa-heart"></i>
-                        <span class="brand-name">LC</span>
-                        <i class="fas fa-heart"></i>
+                        <span class="brand-name" id="loginBrandName">LC</span>
                     </div>
                     <h1>Bienvenido</h1>
                     <p class="auth-subtitle">Inicia sesión en tu cuenta</p>
                 </div>
             </div>
-            
             <div id="loginForm" class="auth-form">
                 <div class="form-group">
                     <div class="input-with-icon">
@@ -102,8 +93,8 @@
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password" />
+                        <button type="button" class="toggle-password" data-target="loginPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                     </div>
-                    <!-- NUEVO: Enlace de recuperar contraseña -->
                     <div class="forgot-password-container">
                         <button class="btn-link" onclick="window.app && window.app.openForgotPasswordModal()">
                             <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
@@ -114,11 +105,7 @@
                     </button>
                 </div>
             </div>
-
-            <div class="auth-divider">
-                <span>¿Primera vez aquí?</span>
-            </div>
-
+            <div class="auth-divider"><span>¿Primera vez aquí?</span></div>
             <button onclick="goToRegister()" class="btn-secondary">
                 <i class="fas fa-user-plus"></i> Crear nueva cuenta
             </button>
@@ -146,9 +133,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="window.app && window.app.closeForgotPasswordModal()">
-                    Cancelar
-                </button>
+                <button class="btn-secondary" onclick="window.app && window.app.closeForgotPasswordModal()">Cancelar</button>
                 <button class="btn-primary" onclick="window.app && window.app.sendPasswordReset()">
                     <i class="fas fa-paper-plane"></i> Enviar enlace
                 </button>
@@ -156,8 +141,9 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
+    <!-- ===== APLICACIÓN PRINCIPAL ===== -->
     <div id="mainApp" class="hidden">
+
         <!-- Header -->
         <header class="app-header">
             <div class="header-container">
@@ -165,15 +151,14 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="header-title">
-                    <h1 id="welcomeName">Bienvenido</h1>
-                    <div class="header-user-info">
-                        <!-- MEJORADO: click en ID para copiar con feedback visual -->
-                        <span id="userIdDisplay" class="user-id-badge copyable-id" onclick="window.app && window.app.copyUserId()" title="Clic para copiar ID">
-                            <i class="fas fa-id-card"></i> <span id="userIdText">#00000</span>
-                            <i class="fas fa-copy copy-icon-small"></i>
-                        </span>
-                        <span class="user-status-indicator active"></span>
-                    </div>
+                    <button id="brandBtn" class="lc-brand-btn" onclick="window.app && window.app.openBrandMeaningModal()" title="Toca para ver el significado">
+                        <span id="appBrandDisplay" class="lc-brand-initials">LC</span>
+                    </button>
+                    <span id="userIdDisplay" class="user-id-badge copyable-id" onclick="window.app && window.app.copyUserId()" title="Clic para copiar ID">
+                        <i class="fas fa-id-card"></i> <span id="userIdText">#00000</span>
+                        <i class="fas fa-copy copy-icon-small"></i>
+                    </span>
+                    <span class="user-status-indicator active"></span>
                 </div>
                 <div class="header-actions">
                     <button class="header-action-btn notification-btn" onclick="app.openNotificationsModal()" title="Notificaciones">
@@ -187,55 +172,74 @@
             </div>
         </header>
 
+        <!-- Modal: Significado del nombre de la app -->
+        <div id="brandMeaningModal" class="modal">
+            <div class="modal-content" style="max-width:380px">
+                <div class="modal-header">
+                    <h3><i class="fas fa-star" style="color:var(--color-primary)"></i> Significado</h3>
+                    <button class="modal-close-btn" onclick="document.getElementById('brandMeaningModal').classList.remove('active');document.body.style.overflow='auto'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="brandMeaningContent" style="display:flex;flex-direction:column;gap:14px;padding:4px 0"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="document.getElementById('brandMeaningModal').classList.remove('active');document.body.style.overflow='auto'">
+                        <i class="fas fa-check"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
         <!-- Sidebar -->
         <div id="appSidebar" class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-brand">
                     <div class="brand-icon">
-                        <i class="fas fa-heart"></i>
-                        <span class="brand-name">LC</span>
-                        <i class="fas fa-heart"></i>
+                        <span class="brand-name" id="sidebarBrandName">LC</span>
                     </div>
-                    <p>Aplicación Personal</p>
+                    <p id="sidebarBrandSubtitle">Aplicación Personal</p>
                 </div>
             </div>
-            
             <nav class="sidebar-nav">
                 <ul class="nav-list">
                     <li>
                         <a href="#" class="nav-item active" onclick="app.showSection('inicioSection')">
-                            <i class="fas fa-home"></i>
-                            <span>Inicio</span>
+                            <i class="fas fa-home"></i><span>Inicio</span>
                         </a>
                     </li>
                     <li>
                         <a href="#" class="nav-item" onclick="app.showSection('amigosSection')">
-                            <i class="fas fa-user-friends"></i>
-                            <span>Amigos</span>
+                            <i class="fas fa-user-friends"></i><span>Amigos</span>
                             <span id="friendRequestsBadge" class="nav-badge hidden">0</span>
                         </a>
                     </li>
                     <li>
                         <a href="#" class="nav-item" onclick="app.showSection('calendarioSection')">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>Calendario</span>
+                            <i class="fas fa-calendar-alt"></i><span>Calendario</span>
                         </a>
                     </li>
                     <li>
                         <a href="#" class="nav-item" onclick="app.showSection('ajustesSection')">
-                            <i class="fas fa-cog"></i>
-                            <span>Ajustes</span>
+                            <i class="fas fa-cog"></i><span>Ajustes</span>
                         </a>
                     </li>
                     <li>
                         <a href="#" class="nav-item" onclick="app.openNewsModal()">
-                            <i class="fas fa-bullhorn"></i>
-                            <span>Novedades</span>
+                            <i class="fas fa-bullhorn"></i><span>Novedades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item" onclick="app.showSection('reportesSection')">
+                            <i class="fas fa-flag"></i><span>Reportes</span>
                         </a>
                     </li>
                 </ul>
             </nav>
-            
             <div class="sidebar-footer">
                 <div class="user-profile-mini">
                     <div class="user-avatar-mini" id="sidebarUserAvatar">
@@ -243,55 +247,33 @@
                     </div>
                     <div class="user-info-mini">
                         <span id="miniUsername">Usuario</span>
-                        <span id="miniUserEmail" class="user-email-mini">usuario@correo.com</span>
+                        <span id="miniUserEmail" class="user-email-mini"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="482b273a3a2d27082d25292124662b2725">[email&#160;protected]</a></span>
                     </div>
                 </div>
                 <button onclick="app.logoutUser()" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Cerrar Sesión</span>
+                    <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
                 </button>
             </div>
         </div>
 
-        <!-- Modal de Notificaciones -->
+        <!-- ===== MODALES ===== -->
+
+        <!-- Modal Notificaciones -->
         <div id="notificationsModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-bell"></i> Notificaciones</h3>
-                    <button class="modal-close-btn" onclick="app.closeNotificationsModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeNotificationsModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div id="notificationsLoading" class="loading-state">
-                        <!-- Skeleton loaders -->
                         <div class="skeleton-list">
-                            <div class="skeleton-item">
-                                <div class="skeleton skeleton-icon"></div>
-                                <div class="skeleton-lines">
-                                    <div class="skeleton skeleton-line short"></div>
-                                    <div class="skeleton skeleton-line long"></div>
-                                </div>
-                            </div>
-                            <div class="skeleton-item">
-                                <div class="skeleton skeleton-icon"></div>
-                                <div class="skeleton-lines">
-                                    <div class="skeleton skeleton-line short"></div>
-                                    <div class="skeleton skeleton-line long"></div>
-                                </div>
-                            </div>
-                            <div class="skeleton-item">
-                                <div class="skeleton skeleton-icon"></div>
-                                <div class="skeleton-lines">
-                                    <div class="skeleton skeleton-line short"></div>
-                                    <div class="skeleton skeleton-line medium"></div>
-                                </div>
-                            </div>
+                            <div class="skeleton-item"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line long"></div></div></div>
+                            <div class="skeleton-item"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line long"></div></div></div>
+                            <div class="skeleton-item"><div class="skeleton skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
                         </div>
                     </div>
-                    <div id="notificationsList" class="notifications-list">
-                        <!-- Notificaciones se cargan aquí -->
-                    </div>
+                    <div id="notificationsList" class="notifications-list"></div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" onclick="app.markAllNotificationsAsRead()">
@@ -304,18 +286,14 @@
             </div>
         </div>
 
-        <!-- Modal de Novedades -->
+        <!-- Modal Novedades -->
         <div id="newsModal" class="modal">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <h3><i class="fas fa-bullhorn"></i> Últimas Novedades</h3>
                     <div class="modal-header-actions">
-                        <button class="btn-text" onclick="app.refreshNews()" title="Refrescar">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="modal-close-btn" onclick="app.closeNewsModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <button class="btn-text" onclick="app.refreshNews()" title="Refrescar"><i class="fas fa-sync-alt"></i></button>
+                        <button class="modal-close-btn" onclick="app.closeNewsModal()"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
                 <div class="modal-body">
@@ -327,26 +305,20 @@
                             <div class="skeleton skeleton-line medium"></div>
                         </div>
                     </div>
-                    <div id="newsContainer" class="news-container">
-                        <!-- UN SOLO CARD por versión se carga aquí -->
-                    </div>
+                    <div id="newsContainer" class="news-container"></div>
                 </div>
                 <div class="modal-footer">
-                    <div class="news-stats">
-                        <span id="newsCount">0</span> versión
-                    </div>
+                    <div class="news-stats"><span id="newsCount">0</span> versión</div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal de Día (Calendario) -->
+        <!-- Modal Día (Calendario) -->
         <div id="dayModal" class="modal">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <h3 id="dayModalTitle"><i class="fas fa-calendar-day"></i> Contenido del día</h3>
-                    <button class="modal-close-btn" onclick="app.closeDayModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeDayModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <!-- Loading skeleton -->
@@ -359,13 +331,10 @@
                             <div class="skeleton skeleton-line long" style="margin-top:20px"></div>
                         </div>
                     </div>
-                    
-                    <!-- CONTENIDO BLOQUEADO PARA DÍAS FUTUROS -->
+                    <!-- Día bloqueado (futuro) -->
                     <div id="dayModalBlocked" class="day-blocked-container hidden">
                         <div class="blocked-content">
-                            <div class="blocked-icon">
-                                <i class="fas fa-lock"></i>
-                            </div>
+                            <div class="blocked-icon"><i class="fas fa-lock"></i></div>
                             <h4>Contenido Bloqueado</h4>
                             <p>Este día aún no está disponible. El contenido se desbloqueará cuando llegue la fecha.</p>
                             <div class="countdown">
@@ -374,40 +343,26 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- CONTENIDO DESBLOQUEADO -->
+                    <!-- Contenido desbloqueado -->
                     <div id="dayModalContent" class="day-content-container hidden">
                         <div class="day-content-main" id="dayContentMain"></div>
                         <div class="day-content-details hidden" id="dayContentDetails"></div>
                     </div>
-
-                    <!-- SECCIÓN DE COMENTARIOS -->
+                    <!-- Sección de comentarios -->
                     <div id="dayCommentsSection" class="day-comments-section hidden">
                         <div class="section-title">
                             <h4><i class="fas fa-comments"></i> Comentarios</h4>
                             <span id="commentsCount" class="badge">0</span>
                         </div>
-                        
                         <div class="comments-container">
                             <div id="dayCommentsList" class="comments-list"></div>
-                            
                             <div class="add-comment-form" id="addCommentForm">
                                 <div class="comment-input-container">
-                                    <div class="user-avatar-small" id="commentUserAvatar">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <textarea 
-                                        id="dayCommentText" 
-                                        placeholder="Escribe tu comentario..." 
-                                        rows="3"
-                                        maxlength="500"
-                                        oninput="app.updateCharCount()"
-                                    ></textarea>
+                                    <div class="user-avatar-small" id="commentUserAvatar"><i class="fas fa-user"></i></div>
+                                    <textarea id="dayCommentText" placeholder="Escribe tu comentario..." rows="3" maxlength="500" oninput="app.updateCharCount()"></textarea>
                                 </div>
                                 <div class="comment-actions">
-                                    <div class="char-counter">
-                                        <span id="charCount">0</span>/500
-                                    </div>
+                                    <div class="char-counter"><span id="charCount">0</span>/500</div>
                                     <button class="btn-primary" onclick="app.postDayComment()" id="postCommentBtn">
                                         <i class="fas fa-paper-plane"></i> Publicar
                                     </button>
@@ -424,14 +379,12 @@
             </div>
         </div>
 
-        <!-- Modal de Cambiar Username -->
+        <!-- Modal Cambiar Username -->
         <div id="changeUsernameModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-user-edit"></i> Cambiar Nombre de Usuario</h3>
-                    <button class="modal-close-btn" onclick="app.closeChangeUsernameModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeChangeUsernameModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -443,9 +396,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="app.closeChangeUsernameModal()">
-                        Cancelar
-                    </button>
+                    <button class="btn-secondary" onclick="app.closeChangeUsernameModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.saveNewUsername()">
                         <i class="fas fa-save"></i> Guardar Cambios
                     </button>
@@ -453,35 +404,58 @@
             </div>
         </div>
 
-        <!-- Modal de Cambiar Contraseña -->
+        <!-- Modal Editar Bio -->
+        <div id="changeBioModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-pen"></i> Editar Bio</h3>
+                    <button class="modal-close-btn" onclick="app.closeChangeBioModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <textarea id="newBio" placeholder="Una frase corta sobre ti..." maxlength="120"
+                            style="width:100%;min-height:90px;padding:12px;border-radius:12px;border:1.5px solid var(--border-color);background:var(--bg-color);color:var(--text-color);font-size:.93rem;resize:none;font-family:inherit;line-height:1.5"
+                            oninput="const c=document.getElementById('bioCharCount');if(c)c.textContent=this.value.length+'/120'"></textarea>
+                        <p class="form-hint" style="display:flex;justify-content:space-between"><span>Visible en tu perfil</span><span id="bioCharCount">0/120</span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeChangeBioModal()">Cancelar</button>
+                    <button class="btn-primary" onclick="app.saveNewBio()">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Cambiar Contraseña -->
         <div id="changePasswordModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
-                    <button class="modal-close-btn" onclick="app.closeChangePasswordModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeChangePasswordModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="currentPassword" placeholder="Contraseña actual" />
+                            <button type="button" class="toggle-password" data-target="currentPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                         </div>
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="newPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)" />
+                            <button type="button" class="toggle-password" data-target="newPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                         </div>
                         <div class="input-with-icon">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="confirmNewPassword" placeholder="Confirmar nueva contraseña" />
+                            <button type="button" class="toggle-password" data-target="confirmNewPassword" tabindex="-1"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="app.closeChangePasswordModal()">
-                        Cancelar
-                    </button>
+                    <button class="btn-secondary" onclick="app.closeChangePasswordModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.saveNewPassword()">
                         <i class="fas fa-save"></i> Cambiar Contraseña
                     </button>
@@ -489,14 +463,12 @@
             </div>
         </div>
 
-        <!-- Modal de Cambiar Email -->
+        <!-- Modal Cambiar Email -->
         <div id="changeEmailModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-envelope"></i> Cambiar Email</h3>
-                    <button class="modal-close-btn" onclick="app.closeChangeEmailModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeChangeEmailModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -512,9 +484,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="app.closeChangeEmailModal()">
-                        Cancelar
-                    </button>
+                    <button class="btn-secondary" onclick="app.closeChangeEmailModal()">Cancelar</button>
                     <button class="btn-primary" onclick="app.saveNewEmail()">
                         <i class="fas fa-save"></i> Cambiar Email
                     </button>
@@ -522,20 +492,16 @@
             </div>
         </div>
 
-        <!-- Modal de Eliminar Cuenta -->
+        <!-- Modal Eliminar Cuenta -->
         <div id="deleteAccountModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-exclamation-triangle"></i> Eliminar Cuenta</h3>
-                    <button class="modal-close-btn" onclick="app.closeDeleteAccountModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeDeleteAccountModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="warning-box">
-                        <div class="warning-icon">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
+                        <div class="warning-icon"><i class="fas fa-exclamation-circle"></i></div>
                         <div class="warning-content">
                             <h4>¡Atención! Esta acción es irreversible</h4>
                             <p>Al eliminar tu cuenta:</p>
@@ -559,9 +525,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="app.closeDeleteAccountModal()">
-                        Cancelar
-                    </button>
+                    <button class="btn-secondary" onclick="app.closeDeleteAccountModal()">Cancelar</button>
                     <button class="btn-danger" onclick="app.deleteAccount()">
                         <i class="fas fa-trash"></i> Eliminar Cuenta Permanentemente
                     </button>
@@ -569,48 +533,35 @@
             </div>
         </div>
 
-        <!-- Modal de Avatar/Foto de Perfil -->
+        <!-- Modal Avatar -->
         <div id="avatarModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3><i class="fas fa-user-circle"></i> Cambiar Foto de Perfil</h3>
-                    <button class="modal-close-btn" onclick="app.closeAvatarModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeAvatarModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="avatar-preview-section">
                         <h4>Vista Previa</h4>
                         <div class="avatar-preview-container">
-                            <div id="avatarPreview" class="avatar-preview-large">
-                                <i class="fas fa-user"></i>
-                            </div>
+                            <div id="avatarPreview" class="avatar-preview-large"><i class="fas fa-user"></i></div>
                             <div class="avatar-current-info">
                                 <p>Avatar actual:</p>
                                 <span id="currentAvatarType">Inicial del nombre</span>
                             </div>
                         </div>
                     </div>
-                    
                     <div class="avatar-options-section">
                         <h4>Opciones</h4>
-                        
                         <div class="avatar-option">
-                            <div class="avatar-option-header">
-                                <i class="fas fa-user"></i>
-                                <h5>Inicial del nombre</h5>
-                            </div>
+                            <div class="avatar-option-header"><i class="fas fa-user"></i><h5>Inicial del nombre</h5></div>
                             <p>Mostrar la primera letra de tu nombre en un círculo de color</p>
                             <button class="btn-secondary" onclick="app.setAvatarType('initial')">
                                 <i class="fas fa-check"></i> Usar inicial
                             </button>
                         </div>
-                        
                         <div class="avatar-option">
-                            <div class="avatar-option-header">
-                                <i class="fas fa-smile"></i>
-                                <h5>Emoji</h5>
-                            </div>
+                            <div class="avatar-option-header"><i class="fas fa-smile"></i><h5>Emoji</h5></div>
                             <p>Selecciona un emoji como tu avatar</p>
                             <div class="emoji-selector">
                                 <input type="text" id="emojiInput" placeholder="Pega un emoji aquí..." maxlength="2" />
@@ -627,12 +578,8 @@
                                 <i class="fas fa-check"></i> Usar emoji
                             </button>
                         </div>
-                        
                         <div class="avatar-option">
-                            <div class="avatar-option-header">
-                                <i class="fas fa-camera"></i>
-                                <h5>Subir foto</h5>
-                            </div>
+                            <div class="avatar-option-header"><i class="fas fa-camera"></i><h5>Subir foto</h5></div>
                             <p>Sube una imagen desde tu dispositivo (JPG, PNG, max 2MB)</p>
                             <div class="file-upload-container">
                                 <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/jpg" hidden />
@@ -648,9 +595,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="app.closeAvatarModal()">
-                        Cancelar
-                    </button>
+                    <button class="btn-secondary" onclick="app.closeAvatarModal()">Cancelar</button>
                     <button class="btn-danger" onclick="app.removeAvatar()">
                         <i class="fas fa-trash"></i> Eliminar avatar
                     </button>
@@ -658,558 +603,12 @@
             </div>
         </div>
 
-        <!-- Contenido Principal -->
-        <div id="mainContent">
-            <!-- Sección Inicio -->
-            <section id="inicioSection" class="content-section active">
-                <div class="section-header">
-                    <h2><i class="fas fa-home"></i> Panel Principal</h2>
-                    <p>Bienvenido a tu espacio personal</p>
-                </div>
-                
-                <div class="dashboard-grid">
-                    <div class="welcome-card">
-                        <div class="welcome-card-header">
-                            <div class="user-avatar-large" id="dashboardUserAvatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="welcome-card-body">
-                                <h3 id="dashboardUsername">Usuario</h3>
-                                <p id="dashboardEmail" class="user-email">usuario@correo.com</p>
-                                <div class="user-stats-row">
-                                    <div class="stat-box">
-                                        <i class="fas fa-id-card"></i>
-                                        <div>
-                                            <span class="stat-label">ID de usuario</span>
-                                            <span class="stat-value" id="dashboardUserId">#00000</span>
-                                        </div>
-                                    </div>
-                                    <div class="stat-box">
-                                        <i class="fas fa-calendar-plus"></i>
-                                        <div>
-                                            <span class="stat-label">Miembro desde</span>
-                                            <span class="stat-value" id="dashboardSince">Hoy</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="welcome-card-actions">
-                            <button class="btn-secondary" onclick="app.showSection('ajustesSection')">
-                                <i class="fas fa-cog"></i> Configuración
-                            </button>
-                            <!-- MEJORADO: botón copiar con feedback visual integrado -->
-                            <button class="btn-primary" onclick="app.copyUserId()" id="copyUserIdBtn">
-                                <i class="fas fa-copy"></i> <span id="copyBtnText">Copiar mi ID</span>
-                            </button>
-                            <button class="btn-primary" onclick="app.openAvatarModal()">
-                                <i class="fas fa-user-circle"></i> Cambiar avatar
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="quick-actions-card">
-                        <h3 class="card-title"><i class="fas fa-bolt"></i> Accesos Rápidos</h3>
-                        <div class="quick-actions-grid">
-                            <div class="quick-action-item" onclick="app.showSection('calendarioSection')">
-                                <div class="action-icon bg-primary">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <h4>Calendario</h4>
-                                <p>Ver contenido diario</p>
-                            </div>
-                            <div class="quick-action-item" onclick="app.showSection('amigosSection')">
-                                <div class="action-icon bg-blue">
-                                    <i class="fas fa-user-friends"></i>
-                                </div>
-                                <h4>Mis Amigos</h4>
-                                <p>Gestiona contactos</p>
-                            </div>
-                            <div class="quick-action-item" onclick="app.openNewsModal()">
-                                <div class="action-icon bg-green">
-                                    <i class="fas fa-bullhorn"></i>
-                                </div>
-                                <h4>Novedades</h4>
-                                <p>Ver actualizaciones</p>
-                            </div>
-                            <div class="quick-action-item" onclick="app.openNotificationsModal()">
-                                <div class="action-icon bg-danger">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                                <h4>Notificaciones</h4>
-                                <p>Ver alertas</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-content-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-clock"></i> Próximo contenido</h3>
-                            <button class="btn-text" onclick="app.showSection('calendarioSection')">
-                                Ver calendario
-                            </button>
-                        </div>
-                        <div id="upcomingContentList" class="content-preview-list">
-                            <!-- Skeleton loader -->
-                            <div class="skeleton-list">
-                                <div class="skeleton-item-row">
-                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
-                                    <div class="skeleton skeleton-line long" style="width:60%"></div>
-                                </div>
-                                <div class="skeleton-item-row">
-                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
-                                    <div class="skeleton skeleton-line long" style="width:55%"></div>
-                                </div>
-                                <div class="skeleton-item-row">
-                                    <div class="skeleton skeleton-line short" style="width:30%"></div>
-                                    <div class="skeleton skeleton-line long" style="width:65%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="recent-activity-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
-                            <button class="btn-text" onclick="app.refreshActivity()">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                        </div>
-                        <div id="recentActivityList" class="activity-list">
-                            <div class="empty-state">
-                                <i class="fas fa-history"></i>
-                                <p>No hay actividad reciente</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sección Amigos -->
-            <section id="amigosSection" class="content-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-user-friends"></i> Amigos</h2>
-                    <p>Gestiona tus contactos</p>
-                </div>
-
-                <div class="friends-container">
-                    <div class="search-guide">
-                        <div class="guide-icon">
-                            <i class="fas fa-id-card"></i>
-                        </div>
-                        <div class="guide-content">
-                            <h4>¿Cómo agregar amigos?</h4>
-                            <p>Cada usuario tiene un <strong>ID único de 5 dígitos</strong>. Comparte tu ID para que otros te encuentren.</p>
-                            <div class="current-user-id">
-                                <span>Tu ID:</span>
-                                <div class="id-display">
-                                    <i class="fas fa-hashtag"></i>
-                                    <span id="currentUserIdDisplay">00000</span>
-                                    <button class="copy-btn" onclick="app.copyUserId()" title="Copiar ID">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="search-form">
-                        <div class="search-input-container">
-                            <div class="input-prefix">
-                                <i class="fas fa-hashtag"></i>
-                            </div>
-                            <input 
-                                type="text" 
-                                id="searchUserId" 
-                                placeholder="00000" 
-                                maxlength="5" 
-                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 5)"
-                                autocomplete="off"
-                            />
-                            <div class="input-counter">
-                                <span id="inputLength">0/5</span>
-                            </div>
-                        </div>
-                        <button onclick="app.searchUserById()" class="btn-primary search-submit-btn">
-                            <i class="fas fa-search"></i> Buscar usuario
-                        </button>
-                    </div>
-
-                    <div class="friends-tabs">
-                        <div class="tab-header">
-                            <button class="tab-btn active" data-tab="friends-list" onclick="app.switchFriendsTab('friends-list')">
-                                <i class="fas fa-users"></i> Mis Amigos
-                                <span id="friendsCountBadge" class="tab-badge">0</span>
-                            </button>
-                            <button class="tab-btn" data-tab="friend-requests" onclick="app.switchFriendsTab('friend-requests')">
-                                <i class="fas fa-user-plus"></i> Solicitudes
-                                <span id="requestsCountBadge" class="tab-badge hidden">0</span>
-                            </button>
-                            <button class="tab-btn" data-tab="sent-requests" onclick="app.switchFriendsTab('sent-requests')">
-                                <i class="fas fa-paper-plane"></i> Enviadas
-                            </button>
-                        </div>
-
-                        <div class="tab-content">
-                            <div id="friends-list" class="tab-pane active">
-                                <div id="friendsListContainer" class="friends-list">
-                                    <!-- Skeleton loader -->
-                                    <div class="skeleton-list">
-                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
-                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="friend-requests" class="tab-pane">
-                                <div id="friendRequestsContainer" class="requests-list">
-                                    <div class="skeleton-list">
-                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="sent-requests" class="tab-pane">
-                                <div id="sentRequestsContainer" class="requests-list">
-                                    <div class="skeleton-list">
-                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="searchResults" class="search-results">
-                        <div class="empty-search-state">
-                            <i class="fas fa-search"></i>
-                            <h4>Buscar usuarios</h4>
-                            <p>Ingresa un ID de 5 dígitos para buscar</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sección Calendario -->
-            <section id="calendarioSection" class="content-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-calendar-alt"></i> Calendario</h2>
-                    <p>Contenido diario disponible</p>
-                </div>
-
-                <div class="calendar-container">
-                    <div class="calendar-controls">
-                        <div class="calendar-controls-left">
-                            <button id="prevMonth" class="calendar-nav-btn">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button id="todayBtn" class="btn-secondary" onclick="app.goToToday()">
-                                <i class="fas fa-calendar-day"></i> Hoy
-                            </button>
-                        </div>
-                        
-                        <div class="calendar-current-month">
-                            <h3 id="currentMonth">Enero 2026</h3>
-                            <p id="currentWeek">Semana actual</p>
-                        </div>
-                        
-                        <div class="calendar-controls-right">
-                            <button id="nextMonth" class="calendar-nav-btn">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="calendar-wrapper">
-                        <div class="calendar-weekdays">
-                            <div>Lun</div>
-                            <div>Mar</div>
-                            <div>Mié</div>
-                            <div>Jue</div>
-                            <div>Vie</div>
-                            <div>Sáb</div>
-                            <div>Dom</div>
-                        </div>
-                        <div id="calendarGrid" class="calendar-grid">
-                            <!-- Calendario se genera aquí -->
-                        </div>
-                    </div>
-
-                    <div class="calendar-footer">
-                        <div class="calendar-legend">
-                            <div class="legend-item">
-                                <div class="legend-color today"></div>
-                                <span>Hoy</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color has-content"></div>
-                                <span>Con contenido</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color future"></div>
-                                <span>Días futuros (bloqueados)</span>
-                            </div>
-                        </div>
-                        <div class="calendar-note">
-                            <p><i class="fas fa-info-circle"></i> Haz clic en un día para ver su contenido</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sección Ajustes -->
-            <section id="ajustesSection" class="content-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-cog"></i> Configuración</h2>
-                    <p>Personaliza tu experiencia</p>
-                </div>
-
-                <div class="settings-container">
-                    <div class="settings-grid">
-                        <!-- Apariencia -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <div class="settings-icon">
-                                    <i class="fas fa-palette"></i>
-                                </div>
-                                <h3>Apariencia</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Modo oscuro/claro</h4>
-                                        <p>Cambia entre temas claro y oscuro</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="themeToggle" />
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Color de tema</h4>
-                                        <p>Elige tu color preferido</p>
-                                    </div>
-                                    <div class="color-picker">
-                                        <button onclick="app.applyColorTheme('red')" data-color="red" 
-                                                class="color-option active">
-                                            <div class="color-dot bg-red"></div>
-                                            <span>Rojo</span>
-                                        </button>
-                                        <button onclick="app.applyColorTheme('blue')" data-color="blue" 
-                                                class="color-option">
-                                            <div class="color-dot bg-blue"></div>
-                                            <span>Azul</span>
-                                        </button>
-                                        <button onclick="app.applyColorTheme('green')" data-color="green" 
-                                                class="color-option">
-                                            <div class="color-dot bg-green"></div>
-                                            <span>Verde</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Avatar y Perfil -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <div class="settings-icon">
-                                    <i class="fas fa-user-circle"></i>
-                                </div>
-                                <h3>Avatar y Perfil</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Foto de perfil / Avatar</h4>
-                                        <p>Cambia tu imagen, emoji o inicial</p>
-                                    </div>
-                                    <button class="btn-primary" onclick="app.openAvatarModal()">
-                                        <i class="fas fa-user-edit"></i> Cambiar avatar
-                                    </button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Nombre de usuario</h4>
-                                        <p>Cambia tu nombre visible</p>
-                                    </div>
-                                    <button class="btn-primary" onclick="app.openChangeUsernameModal()">
-                                        <i class="fas fa-edit"></i> Cambiar
-                                    </button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Cambiar contraseña</h4>
-                                        <p>Actualiza tu contraseña de acceso</p>
-                                    </div>
-                                    <button class="btn-primary" onclick="app.openChangePasswordModal()">
-                                        <i class="fas fa-key"></i> Cambiar
-                                    </button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Correo electrónico</h4>
-                                        <p>Actualiza tu dirección de correo</p>
-                                    </div>
-                                    <button class="btn-primary" onclick="app.openChangeEmailModal()">
-                                        <i class="fas fa-envelope"></i> Cambiar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notificaciones -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <div class="settings-icon">
-                                    <i class="fas fa-bell"></i>
-                                </div>
-                                <h3>Notificaciones</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Solicitudes de amistad</h4>
-                                        <p>Notificaciones de nuevas solicitudes</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notifFriendRequests" checked />
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Novedades</h4>
-                                        <p>Notificaciones de actualizaciones</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notifNews" checked />
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Respuestas</h4>
-                                        <p>Notificaciones de comentarios</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notifComments" checked />
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Sonido de notificaciones</h4>
-                                        <p>Reproducir sonido al recibir</p>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="notifSound" checked />
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cuenta -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <div class="settings-icon">
-                                    <i class="fas fa-user-cog"></i>
-                                </div>
-                                <h3>Cuenta</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Eliminar cuenta</h4>
-                                        <p>Elimina tu cuenta permanentemente</p>
-                                    </div>
-                                    <button class="btn-danger" onclick="app.openDeleteAccountModal()">
-                                        <i class="fas fa-trash"></i> Eliminar
-                                    </button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Exportar datos</h4>
-                                        <p>Descarga tus datos personales</p>
-                                    </div>
-                                    <button class="btn-secondary" onclick="app.exportUserData()">
-                                        <i class="fas fa-download"></i> Exportar
-                                    </button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-info">
-                                        <h4>Actualizar aplicación</h4>
-                                        <p>Verifica si hay actualizaciones</p>
-                                    </div>
-                                    <button class="btn-secondary" onclick="app.checkForUpdates()">
-                                        <i class="fas fa-sync"></i> Verificar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Información -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <div class="settings-icon">
-                                    <i class="fas fa-info-circle"></i>
-                                </div>
-                                <h3>Información</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div class="info-item">
-                                    <i class="fas fa-code"></i>
-                                    <div>
-                                        <p class="info-label">Versión de la aplicación</p>
-                                        <p class="info-value">v1.3.0</p>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-database"></i>
-                                    <div>
-                                        <p class="info-label">Base de datos</p>
-                                        <p class="info-value">Firebase v9.6.0</p>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <div>
-                                        <p class="info-label">Última actualización</p>
-                                        <p class="info-value">Febrero 2026</p>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-shield"></i>
-                                    <div>
-                                        <p class="info-label">Seguridad</p>
-                                        <p class="info-value">SSL/TLS activado</p>
-                                    </div>
-                                </div>
-                                <div class="settings-actions">
-                                    <button class="btn-primary" onclick="app.refreshApp()">
-                                        <i class="fas fa-sync"></i> Recargar aplicación
-                                    </button>
-                                    <button class="btn-secondary" onclick="app.showHelp()">
-                                        <i class="fas fa-question-circle"></i> Ayuda
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Modal de Ayuda -->
+        <!-- Modal Ayuda -->
         <div id="helpModal" class="modal">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <h3><i class="fas fa-question-circle"></i> Ayuda — LC App</h3>
-                    <button class="modal-close-btn" onclick="app.closeHelpModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="app.closeHelpModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="help-grid">
@@ -1255,7 +654,7 @@
                                     <li>Puedes comentar en los días desbloqueados</li>
                                     <li>Los comentarios son visibles para otros usuarios</li>
                                     <li>Máximo <strong>500 caracteres</strong> por comentario</li>
-                                    <li>Puedes dar ❤️ Me gusta a comentarios de otros</li>
+                                    <li>Puedes dar Me gusta a comentarios de otros</li>
                                 </ul>
                             </div>
                         </div>
@@ -1296,14 +695,12 @@
             </div>
         </div>
 
-        <!-- Modal de Política de Privacidad -->
+        <!-- Modal Política de Privacidad -->
         <div id="privacyModal" class="modal">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <h3><i class="fas fa-shield-alt"></i> Política de Privacidad</h3>
-                    <button class="modal-close-btn" onclick="document.getElementById('privacyModal').classList.remove('active'); document.body.style.overflow='auto';">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="document.getElementById('privacyModal').classList.remove('active'); document.body.style.overflow='auto';"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="policy-content">
@@ -1351,14 +748,12 @@
             </div>
         </div>
 
-        <!-- Modal de Términos de Uso -->
+        <!-- Modal Términos de Uso -->
         <div id="termsModal" class="modal">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <h3><i class="fas fa-file-contract"></i> Términos de Uso</h3>
-                    <button class="modal-close-btn" onclick="document.getElementById('termsModal').classList.remove('active'); document.body.style.overflow='auto';">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button class="modal-close-btn" onclick="document.getElementById('termsModal').classList.remove('active'); document.body.style.overflow='auto';"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body">
                     <div class="policy-content">
@@ -1404,7 +799,71 @@
             </div>
         </div>
 
-        <!-- Modal de Confirmación -->
+
+        <!-- Modal Chat -->
+        <div id="chatModal" class="modal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3 id="chatModalTitle"><i class="fas fa-comment-dots"></i> Chat</h3>
+                    <button class="modal-close-btn" onclick="app.closeChatModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body" style="padding:0;display:flex;flex-direction:column;height:420px;">
+                    <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
+                        <div class="empty-state"><i class="fas fa-comments"></i><p>No hay mensajes aún. ¡Di hola!</p></div>
+                    </div>
+                    <div style="border-top:1px solid var(--border-color);padding:12px 16px;display:flex;gap:8px;align-items:flex-end;background:var(--card-bg);border-radius:0 0 16px 16px;">
+                        <textarea id="chatInput" placeholder="Escribe un mensaje..." rows="1" maxlength="500"
+                            style="flex:1;resize:none;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border-color);background:var(--bg-color);color:var(--text-color);font-size:.9rem;font-family:inherit;outline:none;max-height:100px;overflow-y:auto;"
+                            oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'"
+                            onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();app.sendChatMessage();}"></textarea>
+                        <button class="btn-primary" onclick="app.sendChatMessage()" id="sendChatBtn" style="height:40px;border-radius:12px;padding:0 16px;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" id="chatFriendId">
+            </div>
+        </div>
+
+        <!-- Modal Reportar/Bloquear Usuario -->
+        <div id="reportUserModal" class="modal">
+            <div class="modal-content" style="max-width:400px">
+                <div class="modal-header">
+                    <h3><i class="fas fa-flag"></i> Reportar / Bloquear</h3>
+                    <button class="modal-close-btn" onclick="app.closeReportModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <p id="reportUserName" style="font-weight:600;color:var(--text-color);margin-bottom:12px;"></p>
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-flag"></i>
+                            <select id="reportReason" style="width:100%;padding:12px 12px 12px 44px;border-radius:12px;border:1.5px solid var(--border-color);background:var(--bg-color);color:var(--text-color);font-size:.9rem;">
+                                <option value="">— Selecciona un motivo —</option>
+                                <option value="spam">Spam o publicidad</option>
+                                <option value="harassment">Acoso o intimidación</option>
+                                <option value="inappropriate">Contenido inapropiado</option>
+                                <option value="fake">Cuenta falsa</option>
+                                <option value="other">Otro</option>
+                            </select>
+                        </div>
+                        <textarea id="reportDetails" placeholder="Detalles adicionales (opcional)..." maxlength="300" rows="3"
+                            style="width:100%;margin-top:10px;padding:12px;border-radius:12px;border:1.5px solid var(--border-color);background:var(--bg-color);color:var(--text-color);font-size:.9rem;resize:none;font-family:inherit;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="app.closeReportModal()">Cancelar</button>
+                    <button class="btn-danger" onclick="app.blockUser()">
+                        <i class="fas fa-ban"></i> Bloquear
+                    </button>
+                    <button class="btn-primary" onclick="app.submitReport()">
+                        <i class="fas fa-flag"></i> Reportar
+                    </button>
+                </div>
+                <input type="hidden" id="reportTargetId">
+            </div>
+        </div>
+
+        <!-- Modal Confirmación (FIX: no se cierra con click afuera - promesa pendiente) -->
         <div id="confirmModal" class="modal">
             <div class="modal-content" style="max-width:380px">
                 <div class="modal-header">
@@ -1420,16 +879,537 @@
             </div>
         </div>
 
+        <!-- ===== CONTENIDO PRINCIPAL ===== -->
+        <div id="mainContent">
+
+            <!-- Sección Inicio -->
+            <section id="inicioSection" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-home"></i> Panel Principal</h2>
+                    <p>Bienvenido a tu espacio personal</p>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="welcome-card">
+                        <div class="welcome-card-header">
+                            <div class="user-avatar-large" id="dashboardUserAvatar"><i class="fas fa-user"></i></div>
+                            <div class="welcome-card-body">
+                                <h3 id="dashboardUsername">Usuario</h3>
+                                <p id="dashboardEmail" class="user-email"></p>
+                                <p id="profileBio" style="font-size:.82rem;color:var(--text-secondary);margin-top:4px;font-style:italic;cursor:pointer" onclick="app.openChangeBioModal()" title="Editar bio">Sin bio</p>
+                                <div class="user-stats-row">
+                                    <div class="stat-box">
+                                        <i class="fas fa-id-card"></i>
+                                        <div>
+                                            <span class="stat-label">ID de usuario</span>
+                                            <span class="stat-value" id="dashboardUserId">#00000</span>
+                                        </div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <div>
+                                            <span class="stat-label">Miembro desde</span>
+                                            <span class="stat-value" id="dashboardSince">Hoy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="welcome-card-actions">
+                            <button class="btn-secondary" onclick="app.showSection('ajustesSection')">
+                                <i class="fas fa-cog"></i> Configuración
+                            </button>
+                            <button class="btn-primary" onclick="app.copyUserId()" id="copyUserIdBtn">
+                                <i class="fas fa-copy"></i> <span id="copyBtnText">Copiar mi ID</span>
+                            </button>
+                            <button class="btn-primary" onclick="app.openAvatarModal()">
+                                <i class="fas fa-user-circle"></i> Cambiar avatar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-card">
+                        <h3 class="card-title"><i class="fas fa-bolt"></i> Accesos Rápidos</h3>
+                        <div class="quick-actions-grid">
+                            <div class="quick-action-item" onclick="app.showSection('calendarioSection')">
+                                <div class="action-icon bg-primary"><i class="fas fa-calendar-alt"></i></div>
+                                <h4>Calendario</h4><p>Ver contenido diario</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.showSection('amigosSection')">
+                                <div class="action-icon bg-blue"><i class="fas fa-user-friends"></i></div>
+                                <h4>Mis Amigos</h4><p>Gestiona contactos</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.openNewsModal()">
+                                <div class="action-icon bg-green"><i class="fas fa-bullhorn"></i></div>
+                                <h4>Novedades</h4><p>Ver actualizaciones</p>
+                            </div>
+                            <div class="quick-action-item" onclick="app.openNotificationsModal()">
+                                <div class="action-icon bg-danger"><i class="fas fa-bell"></i></div>
+                                <h4>Notificaciones</h4><p>Ver alertas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-content-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Próximo contenido</h3>
+                            <button class="btn-text" onclick="app.showSection('calendarioSection')">Ver calendario</button>
+                        </div>
+                        <div id="upcomingContentList" class="content-preview-list">
+                            <div class="skeleton-list">
+                                <div class="skeleton-item-row"><div class="skeleton skeleton-line short" style="width:30%"></div><div class="skeleton skeleton-line long" style="width:60%"></div></div>
+                                <div class="skeleton-item-row"><div class="skeleton skeleton-line short" style="width:30%"></div><div class="skeleton skeleton-line long" style="width:55%"></div></div>
+                                <div class="skeleton-item-row"><div class="skeleton skeleton-line short" style="width:30%"></div><div class="skeleton skeleton-line long" style="width:65%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+                            <button class="btn-text" onclick="app.refreshActivity()"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                        <div id="recentActivityList" class="activity-list">
+                            <div class="empty-state"><i class="fas fa-history"></i><p>No hay actividad reciente</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Amigos -->
+            <section id="amigosSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-friends"></i> Amigos</h2>
+                    <p>Gestiona tus contactos</p>
+                </div>
+                <div class="friends-container">
+                    <div class="search-guide">
+                        <div class="guide-icon"><i class="fas fa-id-card"></i></div>
+                        <div class="guide-content">
+                            <h4>¿Cómo agregar amigos?</h4>
+                            <p>Cada usuario tiene un <strong>ID único de 5 dígitos</strong>. Comparte tu ID para que otros te encuentren.</p>
+                            <div class="current-user-id">
+                                <span>Tu ID:</span>
+                                <div class="id-display">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span id="currentUserIdDisplay">00000</span>
+                                    <button class="copy-btn" onclick="app.copyUserId()" title="Copiar ID"><i class="fas fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-form">
+                        <div class="search-input-container">
+                            <div class="input-prefix"><i class="fas fa-hashtag"></i></div>
+                            <input type="text" id="searchUserId" placeholder="00000" maxlength="5" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 5)" autocomplete="off" />
+                            <div class="input-counter"><span id="inputLength">0/5</span></div>
+                        </div>
+                        <button onclick="app.searchUserById()" class="btn-primary search-submit-btn">
+                            <i class="fas fa-search"></i> Buscar usuario
+                        </button>
+                    </div>
+                    <div class="friends-tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" data-tab="friends-list" onclick="app.switchFriendsTab('friends-list')">
+                                <i class="fas fa-users"></i> Mis Amigos
+                                <span id="friendsCountBadge" class="tab-badge">0</span>
+                            </button>
+                            <button class="tab-btn" data-tab="friend-requests" onclick="app.switchFriendsTab('friend-requests')">
+                                <i class="fas fa-user-plus"></i> Solicitudes
+                                <span id="requestsCountBadge" class="tab-badge hidden">0</span>
+                            </button>
+                            <button class="tab-btn" data-tab="sent-requests" onclick="app.switchFriendsTab('sent-requests')">
+                                <i class="fas fa-paper-plane"></i> Enviadas
+                            </button>
+                        </div>
+                        <div class="tab-content">
+                            <div id="friends-list" class="tab-pane active">
+                                <div id="friendsListContainer" class="friends-list">
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="friend-requests" class="tab-pane">
+                                <div id="friendRequestsContainer" class="requests-list">
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="sent-requests" class="tab-pane">
+                                <div id="sentRequestsContainer" class="requests-list">
+                                    <div class="skeleton-list">
+                                        <div class="skeleton-item"><div class="skeleton skeleton-avatar"></div><div class="skeleton-lines"><div class="skeleton skeleton-line short"></div><div class="skeleton skeleton-line medium"></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="searchResults" class="search-results">
+                        <div class="empty-search-state">
+                            <i class="fas fa-search"></i>
+                            <h4>Buscar usuarios</h4>
+                            <p>Ingresa un ID de 5 dígitos para buscar</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Calendario (REDISEÑADO) -->
+            <section id="calendarioSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Calendario</h2>
+                    <p>Contenido diario disponible</p>
+                </div>
+                <div class="calendar-container">
+                    <!-- Controles: navegación centrada + botones de acción agrupados -->
+                    <div class="calendar-controls">
+                        <div class="calendar-nav-group">
+                            <button id="prevMonth" class="calendar-nav-btn" title="Mes anterior">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="calendar-current-month">
+                                <h3 id="currentMonth">Enero 2026</h3>
+                                <p id="currentWeek">Semana actual</p>
+                            </div>
+                            <button id="nextMonth" class="calendar-nav-btn" title="Mes siguiente">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-action-group">
+                            <button class="calendar-action-btn" onclick="app.goToToday()" title="Ir a hoy">
+                                <i class="fas fa-calendar-day"></i><span>Hoy</span>
+                            </button>
+                            <button class="calendar-action-btn" onclick="app.loadCalendar()" title="Recargar calendario">
+                                <i class="fas fa-sync-alt"></i><span>Actualizar</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="calendar-wrapper">
+                        <div class="calendar-weekdays">
+                            <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div>
+                            <div class="weekend">Sáb</div><div class="weekend">Dom</div>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                    </div>
+                    <div class="calendar-footer">
+                        <div class="calendar-legend">
+                            <div class="legend-item"><div class="legend-color today"></div><span>Hoy</span></div>
+                            <div class="legend-item"><div class="legend-color has-content"></div><span>Con contenido</span></div>
+                            <div class="legend-item"><div class="legend-color future"></div><span>Bloqueado</span></div>
+                        </div>
+                        <div class="calendar-note">
+                            <i class="fas fa-hand-pointer"></i>
+                            <p>Toca un día para ver su contenido</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección Ajustes -->
+            <section id="ajustesSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cog"></i> Configuración</h2>
+                    <p>Personaliza tu experiencia</p>
+                </div>
+                <div class="settings-container">
+                    <div class="settings-grid">
+
+                        <!-- Apariencia -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon"><i class="fas fa-palette"></i></div>
+                                <h3>Apariencia</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Modo oscuro/claro</h4>
+                                        <p>Cambia entre temas claro y oscuro</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="themeToggle" />
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Color de tema</h4>
+                                        <p>Elige tu color preferido</p>
+                                    </div>
+                                    <div class="color-picker">
+                                        <button onclick="app.applyColorTheme('red')" data-color="red" class="color-option active">
+                                            <div class="color-dot bg-red"></div><span>Rojo</span>
+                                        </button>
+                                        <button onclick="app.applyColorTheme('blue')" data-color="blue" class="color-option">
+                                            <div class="color-dot bg-blue"></div><span>Azul</span>
+                                        </button>
+                                        <button onclick="app.applyColorTheme('green')" data-color="green" class="color-option">
+                                            <div class="color-dot bg-green"></div><span>Verde</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avatar y Perfil -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon"><i class="fas fa-user-circle"></i></div>
+                                <h3>Avatar y Perfil</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Foto de perfil / Avatar</h4><p>Cambia tu imagen, emoji o inicial</p></div>
+                                    <button class="btn-primary" onclick="app.openAvatarModal()"><i class="fas fa-user-edit"></i> Cambiar avatar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Nombre de usuario</h4><p>Cambia tu nombre visible</p></div>
+                                    <button class="btn-primary" onclick="app.openChangeUsernameModal()"><i class="fas fa-edit"></i> Cambiar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Cambiar contraseña</h4><p>Actualiza tu contraseña de acceso</p></div>
+                                    <button class="btn-primary" onclick="app.openChangePasswordModal()"><i class="fas fa-key"></i> Cambiar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Correo electrónico</h4><p>Actualiza tu dirección de correo</p></div>
+                                    <button class="btn-primary" onclick="app.openChangeEmailModal()"><i class="fas fa-envelope"></i> Cambiar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificaciones -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon"><i class="fas fa-bell"></i></div>
+                                <h3>Notificaciones</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Solicitudes de amistad</h4><p>Notificaciones de nuevas solicitudes</p></div>
+                                    <label class="toggle-switch"><input type="checkbox" id="notifFriendRequests" checked /><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Novedades</h4><p>Notificaciones de actualizaciones</p></div>
+                                    <label class="toggle-switch"><input type="checkbox" id="notifNews" checked /><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Respuestas</h4><p>Notificaciones de comentarios</p></div>
+                                    <label class="toggle-switch"><input type="checkbox" id="notifComments" checked /><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Sonido de notificaciones</h4><p>Reproducir sonido al recibir</p></div>
+                                    <label class="toggle-switch"><input type="checkbox" id="notifSound" checked /><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cuenta -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon"><i class="fas fa-user-cog"></i></div>
+                                <h3>Cuenta</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Editar bio</h4><p>Una frase corta sobre ti (max 120 caracteres)</p></div>
+                                    <button class="btn-secondary" onclick="app.openChangeBioModal()"><i class="fas fa-pen"></i> Editar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Eliminar cuenta</h4><p>Elimina tu cuenta permanentemente</p></div>
+                                    <button class="btn-danger" onclick="app.openDeleteAccountModal()"><i class="fas fa-trash"></i> Eliminar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Exportar datos</h4><p>Descarga tus datos personales</p></div>
+                                    <button class="btn-secondary" onclick="app.exportUserData()"><i class="fas fa-download"></i> Exportar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Actualizar aplicación</h4><p>Verifica si hay actualizaciones</p></div>
+                                    <button class="btn-secondary" onclick="app.checkForUpdates()"><i class="fas fa-sync"></i> Verificar</button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info"><h4>Cache del calendario</h4><p>Borra los datos guardados localmente</p></div>
+                                    <button class="btn-secondary" onclick="app.clearCalendarCache()"><i class="fas fa-broom"></i> Borrar cache</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-icon"><i class="fas fa-info-circle"></i></div>
+                                <h3>Información</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="info-item">
+                                    <i class="fas fa-tag"></i>
+                                    <div><p class="info-label">Nombre de la app</p><p class="info-value" id="infoAppName">LC</p></div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-spell-check"></i>
+                                    <div><p class="info-label">Significado</p><p class="info-value" id="infoAppMeaning" style="font-size:.82rem;line-height:1.5">—</p></div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-code"></i>
+                                    <div><p class="info-label">Versión de la aplicación</p><p class="info-value" id="infoAppVersion">v1.4.0</p></div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-database"></i>
+                                    <div><p class="info-label">Base de datos</p><p class="info-value">Firebase v9.6.0</p></div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <div><p class="info-label">Última actualización</p><p class="info-value" id="infoLastUpdate">Febrero 2026</p></div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-shield"></i>
+                                    <div><p class="info-label">Seguridad</p><p class="info-value">SSL/TLS activado</p></div>
+                                </div>
+                                <div class="settings-actions">
+                                    <button class="btn-primary" onclick="app.refreshApp()"><i class="fas fa-sync"></i> Recargar aplicación</button>
+                                    <button class="btn-secondary" onclick="app.showHelp()"><i class="fas fa-question-circle"></i> Ayuda</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SECCIÓN REPORTES ===== -->
+            <section id="reportesSection" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-flag"></i> Reportes</h2>
+                    <p>Envía un reporte al equipo de administración</p>
+                </div>
+
+                <!-- Mis reportes enviados -->
+                <div class="settings-card" style="margin-bottom:16px">
+                    <div class="settings-card-header">
+                        <div class="settings-icon"><i class="fas fa-inbox"></i></div>
+                        <h3>Mis reportes enviados</h3>
+                    </div>
+                    <div class="settings-card-body">
+                        <div id="myReportsList" style="display:flex;flex-direction:column;gap:10px;min-height:60px">
+                            <div class="loading-state" id="myReportsLoading">
+                                <div class="skeleton-list">
+                                    <div class="skeleton-item"><div class="skeleton skeleton-line long"></div></div>
+                                    <div class="skeleton-item"><div class="skeleton skeleton-line medium"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario nuevo reporte -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-icon"><i class="fas fa-plus-circle"></i></div>
+                        <h3>Enviar nuevo reporte</h3>
+                    </div>
+                    <div class="settings-card-body">
+
+                        <!-- Selector de tipo con tarjetas visuales -->
+                        <div style="margin-bottom:18px">
+                            <p style="font-size:.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">¿Qué quieres reportar?</p>
+                            <div id="reportTypeGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+                                <button class="report-type-btn active" data-type="bug" onclick="selectReportType(this,'bug')">
+                                    <span class="rtype-emoji">🐛</span>
+                                    <span class="rtype-label">Bug / Error técnico</span>
+                                </button>
+                                <button class="report-type-btn" data-type="error" onclick="selectReportType(this,'error')">
+                                    <span class="rtype-emoji">⚠️</span>
+                                    <span class="rtype-label">Error en la app</span>
+                                </button>
+                                <button class="report-type-btn" data-type="feature" onclick="selectReportType(this,'feature')">
+                                    <span class="rtype-emoji">💡</span>
+                                    <span class="rtype-label">Sugerencia / Idea</span>
+                                </button>
+                                <button class="report-type-btn" data-type="user" onclick="selectReportType(this,'user')">
+                                    <span class="rtype-emoji">👤</span>
+                                    <span class="rtype-label">Reportar usuario</span>
+                                </button>
+                                <button class="report-type-btn" style="grid-column:span 2" data-type="other" onclick="selectReportType(this,'other')">
+                                    <span class="rtype-emoji">📋</span>
+                                    <span class="rtype-label">Otro</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Campo: usuario reportado (solo visible cuando type=user) -->
+                        <div id="reportUserField" style="display:none;margin-bottom:14px">
+                            <label class="report-field-label">ID o nombre del usuario reportado *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="reportedUserId" placeholder="Ingresa el ID (#12345) o nombre del usuario" />
+                            </div>
+                            <p style="font-size:.77rem;color:var(--text-secondary);margin-top:5px"><i class="fas fa-info-circle"></i> Puedes encontrar el ID en el perfil del usuario</p>
+                        </div>
+
+                        <!-- Título -->
+                        <div style="margin-bottom:14px">
+                            <label class="report-field-label">Título del reporte *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-heading"></i>
+                                <input type="text" id="reportTitle" placeholder="Ej: El calendario no carga al abrir la app" maxlength="100" />
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div style="margin-bottom:14px">
+                            <label class="report-field-label">Descripción detallada *</label>
+                            <textarea id="reportDescription" class="report-textarea"
+                                placeholder="Describe con detalle el problema o sugerencia. Incluye: ¿qué pasó?, ¿qué esperabas que pasara?, ¿cuándo ocurrió?"
+                                rows="5" maxlength="1000"></textarea>
+                            <div style="text-align:right;font-size:.74rem;color:var(--text-secondary);margin-top:3px">
+                                <span id="reportDescCount">0</span>/1000
+                            </div>
+                        </div>
+
+                        <!-- Evidencia (solo para reporte de usuario) -->
+                        <div id="reportEvidenceField" style="display:none;margin-bottom:14px">
+                            <label class="report-field-label">Evidencia / Descripción del comportamiento *</label>
+                            <textarea id="reportEvidence" class="report-textarea"
+                                placeholder="Describe qué hizo este usuario: mensajes ofensivos, acoso, comportamiento inapropiado, etc. Copia el texto exacto si aplica."
+                                rows="4" maxlength="800"></textarea>
+                            <p style="font-size:.77rem;color:var(--text-secondary);margin-top:5px"><i class="fas fa-shield-alt"></i> Tu reporte es confidencial. El usuario no sabrá que lo reportaste.</p>
+                        </div>
+
+                        <!-- Prioridad percibida -->
+                        <div style="margin-bottom:18px">
+                            <label class="report-field-label">¿Qué tan urgente es?</label>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                <button class="priority-btn active" data-priority="low" onclick="selectPriority(this,'low')">🟢 Baja</button>
+                                <button class="priority-btn" data-priority="medium" onclick="selectPriority(this,'medium')">🟡 Media</button>
+                                <button class="priority-btn" data-priority="high" onclick="selectPriority(this,'high')">🔴 Alta</button>
+                                <button class="priority-btn" data-priority="critical" onclick="selectPriority(this,'critical')">🚨 Crítica</button>
+                            </div>
+                        </div>
+
+                        <div id="reportFormError" style="display:none;color:var(--color-danger);font-size:.83rem;margin-bottom:12px;padding:10px;background:var(--color-red-light);border-radius:var(--radius-sm);border:1px solid rgba(239,68,68,.3)"></div>
+
+                        <button class="btn-primary" id="submitReportBtn" onclick="submitReport()" style="width:100%">
+                            <i class="fas fa-paper-plane"></i> Enviar reporte
+                        </button>
+
+                        <p style="font-size:.76rem;color:var(--text-secondary);text-align:center;margin-top:10px">
+                            <i class="fas fa-lock"></i> Tu reporte es revisado solo por los administradores
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /mainContent -->
+
         <!-- Footer -->
         <footer class="app-footer">
             <div class="footer-container">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <i class="fas fa-heart"></i>
-                        <span class="brand-name">LC</span>
-                        <i class="fas fa-heart"></i>
+                        <span class="brand-name" id="footerBrandName">LC</span>
                     </div>
-                    <p>Aplicación Personal v1.3.0</p>
+                    <p id="footerBrandSub">Aplicación Personal v1.4.0</p>
                 </div>
                 <div class="footer-info">
                     <p>&copy; <span id="currentYear">2026</span> - Todos los derechos reservados</p>
@@ -1441,131 +1421,288 @@
                 </div>
             </div>
         </footer>
-    </div>
 
-<script type="module">
-    // ===== FIREBASE CONFIGURACIÓN =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
-    import { 
-        getAuth, 
-        createUserWithEmailAndPassword, 
-        signInWithEmailAndPassword, 
-        onAuthStateChanged, 
-        signOut, 
-        updateProfile, 
-        updatePassword, 
-        updateEmail, 
-        deleteUser, 
-        reauthenticateWithCredential, 
-        EmailAuthProvider,
-        sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
-    import { 
-        getFirestore, 
-        collection, 
-        addDoc, 
-        getDocs, 
-        query, 
-        orderBy, 
-        where, 
-        doc, 
-        setDoc, 
-        getDoc, 
-        updateDoc, 
-        deleteDoc, 
-        serverTimestamp, 
-        writeBatch,
-        onSnapshot
-    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
-    import { 
-        getStorage, 
-        ref, 
-        uploadBytes, 
-        getDownloadURL,
-        deleteObject 
-    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
+    </div><!-- /mainApp -->
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyA3OPY_DxVK7GtLT4mgCP5UpDyk5osQsNY",
-        authDomain: "l-clucia.firebaseapp.com",
-        projectId: "l-clucia",
-        storageBucket: "l-clucia.firebasestorage.app",
-        messagingSenderId: "129492728249",
-        appId: "1:129492728249:web:621ec83c2482d12bb71e68"
-    };
+    <!-- ===== FIREBASE ===== -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword, updateEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, where, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp, writeBatch, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3OPY_DxVK7GtLT4mgCP5UpDyk5osQsNY",
+            authDomain: "l-clucia.firebaseapp.com",
+            projectId: "l-clucia",
+            storageBucket: "l-clucia.firebasestorage.app",
+            messagingSenderId: "129492728249",
+            appId: "1:129492728249:web:621ec83c2482d12bb71e68"
+        };
 
-    window.firebase = {
-        app,
-        auth,
-        firestore: db,
-        storage,
-        firebaseModules: {
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            updateProfile,
-            signOut,
-            updatePassword,
-            updateEmail,
-            deleteUser,
-            reauthenticateWithCredential,
-            EmailAuthProvider,
-            sendPasswordResetEmail,
-            collection,
-            addDoc,
-            getDocs,
-            query,
-            orderBy,
-            where,
-            doc,
-            setDoc,
-            getDoc,
-            updateDoc,
-            deleteDoc,
-            serverTimestamp,
-            writeBatch,
-            onSnapshot,
-            ref,
-            uploadBytes,
-            getDownloadURL,
-            deleteObject
-        }
-    };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
-    console.log("Firebase inicializado correctamente");
+        window.firebase = {
+            app, auth, firestore: db, storage,
+            firebaseModules: {
+                createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut,
+                updatePassword, updateEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider,
+                sendPasswordResetEmail, collection, addDoc, getDocs, query, orderBy, where, doc, setDoc,
+                getDoc, updateDoc, deleteDoc, serverTimestamp, writeBatch, onSnapshot, limit,
+                ref, uploadBytes, getDownloadURL, deleteObject
+            }
+        };
 
-    window.firebaseReady = true;
-    document.dispatchEvent(new CustomEvent('firebaseReady'));
-</script>
+        console.log("Firebase inicializado correctamente");
+        window.firebaseReady = true;
+        document.dispatchEvent(new CustomEvent('firebaseReady'));
+    </script>
+
+    <!-- ===== ESTILOS SECCIÓN REPORTES ===== -->
+    <style>
+    .report-type-btn {
+        display:flex;align-items:center;gap:10px;padding:12px 14px;
+        background:var(--card-bg);border:1.5px solid var(--border-color);
+        border-radius:var(--radius-md);cursor:pointer;transition:all .15s;
+        font-family:var(--font-primary);font-size:.87rem;font-weight:600;color:var(--text-color);
+        text-align:left;width:100%;
+    }
+    .report-type-btn:hover { border-color:var(--color-primary);background:var(--color-primary-light); }
+    .report-type-btn.active { border-color:var(--color-primary);background:var(--color-primary-light);color:var(--color-primary); }
+    .rtype-emoji { font-size:1.3rem;flex-shrink:0; }
+    .rtype-label { font-size:.84rem;font-weight:700; }
+    .report-field-label { display:block;font-size:.78rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px; }
+    .report-textarea {
+        width:100%;padding:12px 14px;background:var(--bg-color);border:1.5px solid var(--border-color);
+        border-radius:var(--radius-md);color:var(--text-color);font-family:var(--font-primary);
+        font-size:.88rem;resize:vertical;outline:none;transition:border-color .15s;line-height:1.6;
+    }
+    .report-textarea:focus { border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-light); }
+    .priority-btn {
+        padding:7px 14px;border-radius:var(--radius-full);border:1.5px solid var(--border-color);
+        background:var(--card-bg);cursor:pointer;font-family:var(--font-primary);
+        font-size:.82rem;font-weight:700;color:var(--text-secondary);transition:all .15s;
+    }
+    .priority-btn:hover { border-color:var(--color-primary);color:var(--color-primary); }
+    .priority-btn.active { border-color:var(--color-primary);background:var(--color-primary-light);color:var(--color-primary); }
+    .my-report-item {
+        display:flex;align-items:flex-start;gap:12px;padding:12px 14px;
+        background:var(--bg-color);border:1.5px solid var(--border-color);
+        border-radius:var(--radius-md);transition:border-color .15s;
+    }
+    .my-report-item:hover { border-color:var(--color-primary); }
+    .my-report-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px; }
+    .my-report-body { flex:1;min-width:0; }
+    .my-report-body h4 { font-size:.87rem;font-weight:700;color:var(--text-color);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .my-report-body p { font-size:.78rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .my-report-meta { display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap; }
+    .report-status-badge {
+        display:inline-flex;align-items:center;gap:3px;padding:1px 8px;border-radius:99px;
+        font-size:.69rem;font-weight:800;
+    }
+    .rsbadge-open { background:rgba(239,68,68,.12);color:#ef4444; }
+    .rsbadge-review { background:rgba(245,158,11,.12);color:#f59e0b; }
+    .rsbadge-resolved { background:rgba(16,185,129,.12);color:#10b981; }
+    .rsbadge-closed { background:rgba(107,114,128,.12);color:#6b7280; }
+    </style>
+
+    <!-- ===== JS SECCIÓN REPORTES (usuario) ===== -->
     <script>
         window.goToRegister = function() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('registerScreen').classList.remove('hidden');
         };
-        
         window.goToLogin = function() {
             document.getElementById('registerScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
         };
 
+        /* ===== REPORTES - LÓGICA USUARIO ===== */
+        let _reportType = 'bug';
+        let _reportPriority = 'low';
+
+        window.selectReportType = function(btn, type) {
+            _reportType = type;
+            document.querySelectorAll('.report-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Mostrar/ocultar campos de usuario reportado y evidencia
+            const showUser = type === 'user';
+            document.getElementById('reportUserField').style.display = showUser ? 'block' : 'none';
+            document.getElementById('reportEvidenceField').style.display = showUser ? 'block' : 'none';
+        };
+
+        window.selectPriority = function(btn, priority) {
+            _reportPriority = priority;
+            document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        // Contador de caracteres
+        const descInput = document.getElementById('reportDescription');
+        if (descInput) {
+            descInput.addEventListener('input', () => {
+                const el = document.getElementById('reportDescCount');
+                if (el) el.textContent = descInput.value.length;
+            });
+        }
+
+        window.submitReport = async function() {
+            const title = (document.getElementById('reportTitle')?.value || '').trim();
+            const desc = (document.getElementById('reportDescription')?.value || '').trim();
+            const evidence = (document.getElementById('reportEvidence')?.value || '').trim();
+            const reportedUser = (document.getElementById('reportedUserId')?.value || '').trim();
+            const errEl = document.getElementById('reportFormError');
+            const btn = document.getElementById('submitReportBtn');
+
+            errEl.style.display = 'none';
+            if (!title) { errEl.textContent = 'El título es obligatorio.'; errEl.style.display = 'block'; return; }
+            if (!desc) { errEl.textContent = 'La descripción es obligatoria.'; errEl.style.display = 'block'; return; }
+            if (_reportType === 'user' && !reportedUser) { errEl.textContent = 'Ingresa el ID o nombre del usuario a reportar.'; errEl.style.display = 'block'; return; }
+            if (_reportType === 'user' && !evidence) { errEl.textContent = 'Describe la evidencia del comportamiento del usuario.'; errEl.style.display = 'block'; return; }
+
+            btn.disabled = true;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando…';
+
+            try {
+                // Esperar a que Firebase y la app estén listos
+                if (!window.firebase || !window.app) {
+                    throw new Error('La app no está lista. Espera un momento e intenta de nuevo.');
+                }
+
+                const user = window.firebase.auth.currentUser;
+                if (!user) throw new Error('Debes iniciar sesión para enviar un reporte.');
+
+                const { addDoc, collection, serverTimestamp } = window.firebase.firebaseModules;
+                const db = window.firebase.firestore;
+
+                // Obtener datos del perfil del usuario desde la app
+                const userData = window.app?.currentUser || {};
+
+                const reportData = {
+                    type: _reportType,
+                    priority: _reportPriority,
+                    title,
+                    description: desc,
+                    status: 'open',
+                    // Datos del remitente
+                    userId: user.uid,
+                    userEmail: user.email,
+                    userName: userData.username || user.email,
+                    userAppId: userData.userId || null,
+                    // Datos del usuario reportado (si aplica)
+                    reportedUserId: _reportType === 'user' ? reportedUser : null,
+                    evidence: _reportType === 'user' ? evidence : null,
+                    source: 'app',
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                };
+
+                await addDoc(collection(db, 'reports'), reportData);
+
+                // Limpiar formulario
+                document.getElementById('reportTitle').value = '';
+                document.getElementById('reportDescription').value = '';
+                if (document.getElementById('reportEvidence')) document.getElementById('reportEvidence').value = '';
+                if (document.getElementById('reportedUserId')) document.getElementById('reportedUserId').value = '';
+                document.getElementById('reportDescCount').textContent = '0';
+
+                // Mostrar mensaje de éxito
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Reporte enviado!';
+                btn.style.background = 'var(--color-green)';
+                setTimeout(() => {
+                    btn.innerHTML = origText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+
+                // Recargar mis reportes
+                loadMyReports();
+
+            } catch (e) {
+                errEl.textContent = 'Error: ' + e.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        };
+
+        // Estado visual de reportes
+        const REPORT_STATUS_LABELS = { open: 'Pendiente', review: 'En revisión', resolved: 'Resuelto', closed: 'Cerrado' };
+        const REPORT_STATUS_CLASSES = { open: 'rsbadge-open', review: 'rsbadge-review', resolved: 'rsbadge-resolved', closed: 'rsbadge-closed' };
+        const REPORT_TYPE_EMOJIS = { bug: '🐛', error: '⚠️', feature: '💡', user: '👤', other: '📋' };
+        const REPORT_TYPE_DOTS = { bug: '#ef4444', error: '#fb923c', feature: '#5b6ef5', user: '#f59e0b', other: '#6b7280' };
+
+        window.loadMyReports = async function() {
+            const container = document.getElementById('myReportsList');
+            if (!container) return;
+            if (!window.firebase || !window.firebase.auth.currentUser) {
+                container.innerHTML = '<p style="color:var(--text-secondary);font-size:.84rem;text-align:center;padding:16px">Inicia sesión para ver tus reportes.</p>';
+                return;
+            }
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary)"><i class="fas fa-spinner fa-spin"></i> Cargando…</div>';
+            try {
+                const user = window.firebase.auth.currentUser;
+                const { getDocs, collection, query, where, orderBy } = window.firebase.firebaseModules;
+                const db = window.firebase.firestore;
+                const snap = await getDocs(query(collection(db, 'reports'), where('userId', '==', user.uid)));
+                const items = [];
+                snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+                // Ordenar en cliente — evita requerir índice compuesto en Firestore
+                items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                if (!items.length) {
+                    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-secondary)"><i class="fas fa-inbox" style="font-size:1.8rem;margin-bottom:8px;display:block;opacity:.3"></i><p style="font-size:.84rem">No has enviado reportes todavía.</p></div>';
+                    return;
+                }
+                container.innerHTML = items.map(r => {
+                    const status = r.status || 'open';
+                    const ts = r.createdAt?.seconds ? new Date(r.createdAt.seconds * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+                    return `<div class="my-report-item">
+                        <div class="my-report-dot" style="background:${REPORT_TYPE_DOTS[r.type] || '#6b7280'}"></div>
+                        <div class="my-report-body">
+                            <h4>${REPORT_TYPE_EMOJIS[r.type] || '📋'} ${r.title || 'Sin título'}</h4>
+                            <p>${(r.description || '').slice(0, 80)}${(r.description || '').length > 80 ? '…' : ''}</p>
+                            <div class="my-report-meta">
+                                <span class="report-status-badge ${REPORT_STATUS_CLASSES[status]}">${REPORT_STATUS_LABELS[status]}</span>
+                                ${r.adminNote ? `<span style="font-size:.73rem;color:var(--text-secondary)"><i class="fas fa-sticky-note"></i> Nota admin: ${r.adminNote.slice(0,50)}…</span>` : ''}
+                                <span style="font-size:.72rem;color:var(--text-secondary)">${ts}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                container.innerHTML = '<p style="color:var(--color-danger);font-size:.83rem;padding:12px">Error al cargar reportes. Verifica tu conexión.</p>';
+            }
+        };
+
+        // Cargar reportes cuando se muestre la sección
+        const _origShowSection = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hook: cada vez que se navega a reportesSection cargar los reportes
+            const observer = new MutationObserver(() => {
+                const sec = document.getElementById('reportesSection');
+                if (sec && !sec.classList.contains('hidden') && window.firebase?.auth?.currentUser) {
+                    loadMyReports();
+                }
+            });
+            const sec = document.getElementById('reportesSection');
+            if (sec) observer.observe(sec, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+
         function loadAppScript() {
             const script = document.createElement('script');
             script.src = 'index.js';
-            script.onerror = function() {
-                console.error('No se pudo cargar index.js');
-            };
+            script.onload = () => { if (typeof App !== 'undefined' && !window.app) window.app = new App(); };
+            script.onerror = () => console.error('Error cargando index.js');
             document.body.appendChild(script);
         }
 
-        if (window.firebaseReady) {
-            loadAppScript();
-        } else {
-            document.addEventListener('firebaseReady', loadAppScript, { once: true });
-        }
+        if (window.firebaseReady) { loadAppScript(); }
+        else { document.addEventListener('firebaseReady', loadAppScript); }
     </script>
+
 </body>
 </html>
